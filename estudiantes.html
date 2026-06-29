@@ -1,0 +1,2867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>asistApp — Estudiantes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+<style>
+#carrera-screen {
+  padding: 1.5rem 1rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.carrera-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.carrera-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--txt);
+  margin: 0 0 .3rem;
+}
+.carrera-header p {
+  font-size: .8rem;
+  color: var(--txt-muted, #6b7280);
+  margin: 0;
+}
+.carrera-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: .85rem;
+}
+.carrera-card {
+  background: var(--card-bg, #fff);
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+.carrera-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.1);
+  border-color: var(--nivel-color, #059669);
+}
+.carrera-card-titulo {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--txt);
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+.carrera-card-tipo {
+  font-size: .72rem;
+  color: var(--txt-muted, #6b7280);
+  font-weight: 500;
+}
+.carrera-card-count {
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--nivel-color, #059669);
+  margin-top: .2rem;
+}
+#carrera-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  padding: .6rem 1rem;
+  background: var(--card-bg, #fff);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+#btn-volver-carreras {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  background: none;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  padding: .35rem .7rem;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--txt);
+  transition: background .15s;
+}
+#btn-volver-carreras:hover { background: var(--hover-bg, #f3f4f6); }
+.carrera-bc-sep { color: var(--txt-muted, #9ca3af); font-size: .85rem; }
+#carrera-bc-nombre {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--txt);
+  flex: 1;
+}
+.anio-tabs {
+  display: flex;
+  gap: .35rem;
+  margin-left: auto;
+}
+.anio-tab {
+  background: none;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 20px;
+  padding: .3rem .8rem;
+  font-size: .74rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--txt-muted, #6b7280);
+  transition: all .15s;
+}
+.anio-tab.activo {
+  background: var(--nivel-color, #059669);
+  border-color: var(--nivel-color, #059669);
+  color: #fff;
+}
+</style>
+
+<style id="asistencia-css">
+#asistencia-diaria-tabla {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.asist-carrera-bloque {
+  background: var(--card-bg, #fff);
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.asist-carrera-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .7rem 1rem;
+  background: var(--hover-bg, #f9fafb);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  cursor: pointer;
+  gap: .5rem;
+}
+.asist-carrera-nombre {
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--txt);
+  flex: 1;
+}
+.asist-carrera-pct {
+  font-size: .8rem;
+  font-weight: 700;
+  padding: .2rem .6rem;
+  border-radius: 20px;
+}
+.asist-carrera-pct.alta  { background: #dcfce7; color: #166534; }
+.asist-carrera-pct.media { background: #fef9c3; color: #854d0e; }
+.asist-carrera-pct.baja  { background: #fee2e2; color: #991b1b; }
+.asist-carrera-pct.sin   { background: var(--hover-bg,#f3f4f6); color: var(--txt-muted,#6b7280); }
+.asist-anios-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .78rem;
+}
+.asist-anios-tabla th {
+  text-align: left;
+  padding: .5rem 1rem;
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--txt-muted, #6b7280);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  background: var(--card-bg, #fff);
+}
+.asist-anios-tabla td {
+  padding: .55rem 1rem;
+  border-bottom: 1px solid var(--border, #f3f4f6);
+  color: var(--txt);
+}
+.asist-anios-tabla tr:last-child td { border-bottom: none; }
+.asist-barra-wrap {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.asist-barra {
+  flex: 1;
+  height: 6px;
+  background: var(--border, #e5e7eb);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.asist-barra-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.asist-barra-fill.alta  { background: #22c55e; }
+.asist-barra-fill.media { background: #eab308; }
+.asist-barra-fill.baja  { background: #ef4444; }
+.asist-barra-fill.sin   { background: #d1d5db; }
+.asist-pct-num {
+  font-size: .75rem;
+  font-weight: 700;
+  min-width: 2.8rem;
+  text-align: right;
+}
+.asist-pct-num.alta  { color: #166534; }
+.asist-pct-num.media { color: #854d0e; }
+.asist-pct-num.baja  { color: #991b1b; }
+.asist-pct-num.sin   { color: #9ca3af; }
+.asist-detalle {
+  font-size: .72rem;
+  color: var(--txt-muted, #9ca3af);
+}
+.asist-loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--txt-muted, #6b7280);
+  font-size: .82rem;
+}
+</style>
+
+
+<style id="est-hide-css">
+/* Ocultar todos los badges excepto % HOY y PRES. y TOTAL */
+body[data-nivel="estudiantes"] .pct-turnos-detalle { display:none !important; }
+body[data-nivel="estudiantes"] [data-filtro="injustificada"],
+body[data-nivel="estudiantes"] [data-filtro="justificada_parcial"],
+body[data-nivel="estudiantes"] [data-filtro="injustificada_parcial"],
+body[data-nivel="estudiantes"] [data-filtro="medica"],
+body[data-nivel="estudiantes"] [data-filtro="medica_familiar"],
+body[data-nivel="estudiantes"] [data-filtro="cambio_guardia"],
+body[data-nivel="estudiantes"] [data-filtro="duelo"],
+body[data-nivel="estudiantes"] [data-filtro="embarazo"],
+body[data-nivel="estudiantes"] [data-filtro="gremial"],
+body[data-nivel="estudiantes"] [data-filtro="psiquiatrico"],
+body[data-nivel="estudiantes"] [data-filtro="formacion"],
+body[data-nivel="estudiantes"] [data-filtro="paro"],
+body[data-nivel="estudiantes"] [data-filtro="turno-maniana"],
+body[data-nivel="estudiantes"] [data-filtro="turno-tarde"],
+body[data-nivel="estudiantes"] #cnt-i,
+body[data-nivel="estudiantes"] #cnt-jp,
+body[data-nivel="estudiantes"] #cnt-ip,
+body[data-nivel="estudiantes"] #cnt-m,
+body[data-nivel="estudiantes"] #cnt-mf,
+body[data-nivel="estudiantes"] #cnt-cg,
+body[data-nivel="estudiantes"] #cnt-du,
+body[data-nivel="estudiantes"] #cnt-em,
+body[data-nivel="estudiantes"] #cnt-gr,
+body[data-nivel="estudiantes"] #cnt-ps,
+body[data-nivel="estudiantes"] #cnt-fo,
+body[data-nivel="estudiantes"] #cnt-pa,
+body[data-nivel="estudiantes"] #pct-maniana,
+body[data-nivel="estudiantes"] #pct-tarde { display:none !important; }
+
+/* Ocultar el padre de esos badges también */
+body[data-nivel="estudiantes"] .si:has(#cnt-i),
+body[data-nivel="estudiantes"] .si:has(#cnt-ip),
+body[data-nivel="estudiantes"] .si:has(#cnt-m),
+body[data-nivel="estudiantes"] .si:has(#cnt-mf),
+body[data-nivel="estudiantes"] .si:has(#cnt-cg),
+body[data-nivel="estudiantes"] .si:has(#cnt-du),
+body[data-nivel="estudiantes"] .si:has(#cnt-em),
+body[data-nivel="estudiantes"] .si:has(#cnt-gr),
+body[data-nivel="estudiantes"] .si:has(#cnt-ps),
+body[data-nivel="estudiantes"] .si:has(#cnt-fo),
+body[data-nivel="estudiantes"] .si:has(#cnt-pa) { display:none !important; }
+
+/* Ocultar select de días y turno */
+body[data-nivel="estudiantes"] #filtro-dia { display:none !important; }
+body[data-nivel="estudiantes"] #btn-turno-m,
+body[data-nivel="estudiantes"] #btn-turno-t { display:none !important; }
+
+/* Ocultar jubilados */
+body[data-nivel="estudiantes"] #btn-retirados { display:none !important; }
+
+/* Ocultar toggle jubilado en el modal */
+body[data-nivel="estudiantes"] .jub-toggle-txt,
+body[data-nivel="estudiantes"] #mde-jubilado { display:none !important; }
+
+/* En el modal de novedad, solo mostrar Ausente/Presente */
+body[data-nivel="estudiantes"] .nov-tipos-extra { display:none !important; }
+</style>
+
+
+<style id="carrera-pct-css">
+.carrera-card { position: relative; }
+.carrera-pct-hoy {
+  font-size: .72rem;
+  font-weight: 700;
+  padding: .2rem .5rem;
+  border-radius: 20px;
+  margin-top: .3rem;
+  display: inline-block;
+}
+.carrera-pct-hoy.alta  { background:#dcfce7; color:#166534; }
+.carrera-pct-hoy.media { background:#fef9c3; color:#854d0e; }
+.carrera-pct-hoy.baja  { background:#fee2e2; color:#991b1b; }
+.carrera-pct-hoy.sin   { background:#f3f4f6; color:#9ca3af; }
+.carrera-resumen-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .8rem 1rem;
+  background: var(--card-bg,#fff);
+  border: 1.5px solid var(--border,#e5e7eb);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.resumen-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+  padding: .4rem .7rem;
+  border-radius: 10px;
+  gap: .1rem;
+}
+.resumen-badge .rb-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.resumen-badge .rb-lbl {
+  font-size: .65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  opacity: .8;
+}
+.resumen-badge.pres  { background:#dcfce7; color:#166534; }
+.resumen-badge.aus   { background:#fee2e2; color:#991b1b; }
+.resumen-badge.total { background:#f3f4f6; color:#374151; }
+.resumen-badge.pct   { background:#dbeafe; color:#1e40af; }
+</style>
+
+</head>
+<body>
+
+<!-- PANTALLA LICENCIA BLOQUEADA -->
+<div id="licencia-screen" style="display:none">
+  <div class="licencia-card">
+    <div class="licencia-icon">🔒</div>
+    <h2>Sistema suspendido</h2>
+    <p id="licencia-msg">El acceso a este sistema ha sido suspendido. Por favor contactá al administrador.</p>
+    <div class="licencia-contact" id="licencia-contact"></div>
+    <button id="btn-logout-lic" class="btn-sec" style="margin-top:1.5rem">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- PANTALLA LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <h1>asist<span>App</span></h1>
+      <p>UPC — Sede Las Varillas</p>
+    </div>
+    <div class="login-btns">
+      <button id="btn-login-google" class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Ingresar con Google
+      </button>
+      
+    </div>
+  </div>
+</div>
+
+<!-- BARRA DE USUARIO (visible cuando está logueado) -->
+<div id="user-bar" style="display:none">
+  <img id="user-avatar" src="" alt=""/>
+  <span id="user-name"></span>
+  <span id="user-role"></span>
+  <button id="btn-dark" title="Modo oscuro"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  <button id="btn-logout">Salir</button>
+</div>
+
+<header>
+  <div>
+    <h1>asist<span>App</span></h1>
+    <p id="fecha-hoy"></p>
+    <nav class="nivel-nav">
+      <a href="index.html" class="nivel-nav-btn"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Profesores</a>
+      <a href="estudiantes.html" class="nivel-nav-btn activo"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Estudiantes</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-top:.3rem">
+      <select id="selector-anio" class="anio-sel"><option value="2026">2026 (actual)</option></select>
+    </div>
+    <div class="fecha-nav">
+      <button id="btn-fecha-ant">‹</button>
+      <input type="date" id="input-fecha-hdr"/>
+      <button id="btn-fecha-sig">›</button>
+      <button id="btn-fecha-hoy-hdr" class="btn-hdr-hoy">Hoy</button>
+    </div>
+  </div>
+  <div class="summary">
+    <!-- IDs que app.js necesita pero no se muestran -->
+    <span id="pct-hoy" style="display:none"></span>
+    <span id="pct-maniana" style="display:none"></span>
+    <span id="pct-tarde" style="display:none"></span>
+    <span id="cnt-i" style="display:none"></span>
+    <span id="cnt-fp" style="display:none"></span>
+    <span id="cnt-m" style="display:none"></span>
+    <span id="cnt-mf" style="display:none"></span>
+    <span id="cnt-c" style="display:none"></span>
+    <span id="cnt-d" style="display:none"></span>
+    <span id="cnt-le" style="display:none"></span>
+    <span id="cnt-lg" style="display:none"></span>
+    <span id="cnt-cp" style="display:none"></span>
+    <span id="cnt-fo" style="display:none"></span>
+    <span id="cnt-par" style="display:none"></span>
+    <!-- Badges visibles -->
+    <div class="si big pct-turno-total" title="% asistencia hoy">
+      <span class="v" id="pct-hoy-est" style="color:#6EE7B7">—</span>
+      <span class="l">% HOY</span>
+    </div>
+    <div class="si-sep"></div>
+    <div class="si si-btn" data-filtro="presente" title="Presentes"><span class="v" id="cnt-p" style="color:#6EE7B7">0</span><span class="l">Pres.</span></div>
+    <div class="si si-btn" data-filtro="justificada" title="Ausentes"><span class="v" id="cnt-j" style="color:#FCA5A5">0</span><span class="l">Aus.</span></div>
+    <div class="si-sep"></div>
+    <div class="si si-btn" data-filtro="" title="Ver todos"><span class="v" id="cnt-tot">0</span><span class="l">Total</span></div>
+  </div>
+  <div class="hdr-actions-wrap">
+    <div class="hdr-dropdown">
+      <button class="btn-hdr btn-hdr-menu" id="btn-acciones-menu"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Acciones ▾</button>
+      <div class="hdr-dropdown-list" id="hdr-dropdown-list">
+        <button class="hdr-dd-item btn-hdr-reporte" id="btn-reporte-grupo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Reporte por grupo</button>
+        <button class="hdr-dd-item btn-hdr-config"  id="btn-config"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config</button>
+        <button class="hdr-dd-item" id="btn-horarios-carrera">📚 Materias por carrera</button>
+        <button class="hdr-dd-item btn-hdr-grupos"  id="btn-grupos"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Grupos</button>
+        <button class="hdr-dd-item btn-hdr-export"  id="btn-export-dia"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar hoy</button>
+        <button class="hdr-dd-item btn-hdr-ranking" id="btn-ranking"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Ranking</button>
+        <button class="hdr-dd-item btn-hdr-masivo"  id="btn-masivo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Registro masivo</button>
+        <button class="hdr-dd-item" id="btn-importar-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Importar archivo</button>
+        <button class="hdr-dd-item" id="btn-eliminar-masivo" style="color:#FCA5A5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> Eliminar estudiantes</button>
+        <button class="hdr-dd-item" id="btn-papelera" style="display:none" onclick="abrirPapelera()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> <span style="color:#DC2626">Papelera</span></button>
+        <button class="hdr-dd-item" id="btn-tendencias"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Tendencias</button>
+        <button class="hdr-dd-item" id="btn-retirados" style="display:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M9 14l-2 6"/><path d="M15 14l2 6"/><path d="M7 20h10"/></svg> Jubilados</button>
+      </div>
+    </div>
+    <!-- CAMPANA DE ALERTAS -->
+    <div class="alertas-wrap" id="alertas-wrap">
+      <button class="btn-hdr btn-alertas" id="btn-alertas" title="Alertas de vencimiento" onclick="abrirPanelAlertas()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="alertas-badge" id="alertas-badge" style="display:none">0</span>
+      </button>
+      <div class="panel-alertas" id="panel-alertas">
+        <div class="alertas-hdr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Vencimientos próximos
+        </div>
+        <div class="alertas-lista" id="alertas-lista"></div>
+      </div>
+    </div>
+    <button class="btn-hdr btn-hdr-nuevo" id="btn-nuevo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nuevo estudiante</button>
+  </div>
+</header>
+
+<!-- PANTALLA SELECCIÓN DE CARRERA -->
+<div id="carrera-screen" style="display:none">
+  <div class="carrera-header">
+    <h2>Seleccioná una carrera</h2>
+    <p id="carrera-subtitle">UPC — Sede Las Varillas</p>
+  </div>
+  <div class="carrera-grid" id="carrera-grid">
+  <!-- PANEL ASISTENCIA DIARIA -->
+  <div id="asistencia-diaria-panel" style="margin-top:2rem;display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <h3 style="margin:0;font-size:1rem;font-weight:700;color:var(--txt)">
+        Asistencia del día — <span id="asistencia-fecha-label"></span>
+      </h3>
+      <button id="btn-refrescar-asistencia" onclick="calcularAsistenciaDiaria()" 
+        style="background:none;border:1.5px solid var(--border,#e5e7eb);border-radius:8px;padding:.3rem .8rem;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--txt);display:flex;align-items:center;gap:.3rem">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Actualizar
+      </button>
+    </div>
+    <div id="asistencia-diaria-tabla"></div>
+  </div>
+</div>
+</div>
+
+<!-- BREADCRUMB carrera seleccionada -->
+<div id="carrera-breadcrumb" style="display:none">
+  <button id="btn-volver-carreras" onclick="volverACarreras()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Carreras
+  </button>
+  <span class="carrera-bc-sep">›</span>
+  <span id="carrera-bc-nombre"></span>
+  <div class="anio-tabs" id="anio-tabs">
+    <!-- se generan dinámicamente al seleccionar carrera -->
+  </div>
+</div>
+
+<main style="display:none">
+  <!-- TOGGLE DE VISTA -->
+  <div class="vista-toggle" id="vista-toggle">
+    <button class="vista-btn activo" data-vista="cards" onclick="cambiarVista('cards')" title="Vista cards">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Cards
+    </button>
+    <button class="vista-btn" data-vista="semana" onclick="cambiarVista('semana')" title="Vista semana">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Semana
+    </button>
+    <button class="vista-btn" data-vista="mes" onclick="cambiarVista('mes')" title="Vista mes">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="13" y2="18"/></svg>
+      Mes
+    </button>
+  </div>
+  <!-- CONTENEDOR CALENDARIO -->
+  <div id="cal-wrap" style="display:none">
+    <div id="cal-nav" class="cal-nav"></div>
+    <div id="cal-table-zone"></div>
+  </div>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="buscador-wrap">
+        <span class="buscador-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input type="text" id="buscador" placeholder="Buscar estudiante…" autocomplete="off"/>
+      </div>
+      <select id="filtro-estado">
+        <option value="">Todos los estados</option>
+        <option value="presente">✅ Presente</option>
+        <option value="justificada">📄 Just. Justificada</option>
+        <option value="injustificada">❌ Injustificada</option>
+        <option value="medica">🏥 Carpeta Médica</option>
+        <option value="medica_familiar">👨‍👩‍👧 C. Méd. Familiar</option>
+        <option value="cambio">🔄 Cambio de Actividad</option>
+        <option value="duelo">🕊️ Duelo</option>
+        <option value="lic_embarazo">🤰 Lic. Embarazo</option>
+        <option value="lic_gremial">✊ Lic. Gremial</option>
+        <option value="carpeta_psiq">🧠 Carpeta Psiquiátrica</option>
+        <option value="formacion">📚 Formación otra institución</option>
+        <option value="adelanto">⏩ Adelanto de Horas</option>
+        <option value="compensada">✅ Falta Compensada</option>
+        <option value="paro">✊ Inasistencia</option>
+        <option value="sin-registro">— Sin registro</option>
+      </select>
+      <select id="filtro-dia" style="display:none">
+        <option value="">Todos los días</option>
+        <option value="hoy">📅 Solo los de hoy</option>
+        <option value="1">Lunes</option>
+        <option value="2">Martes</option>
+        <option value="3">Miércoles</option>
+        <option value="4">Jueves</option>
+        <option value="5">Viernes</option>
+        <option value="6">Sábado</option>
+      </select>
+      <select id="filtro-grupo"><option value="">Todos los grupos</option></select>
+      <select id="filtro-area"><option value="">Todas las áreas</option></select>
+      <button id="filtro-reset" title="Limpiar filtros">✕ Limpiar</button>
+    </div>
+    <span id="filtro-count" class="filtro-count"></span>
+  </div>
+  <div id="grid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</main>
+
+
+
+<!-- MODAL REPORTE GRUPO -->
+<dialog id="modal-reporte-grupo">
+  <div class="dlg-hdr">
+    <div>
+      <h2>Reporte por grupo</h2>
+      <p id="rg-subtit">Seleccioná un grupo y período</p>
+    </div>
+    <button class="btn-x" id="xrg">✕</button>
+  </div>
+  <div class="perf-periodo-bar">
+    <select id="rg-grupo">
+      <option value="">— Seleccioná un grupo —</option>
+    </select>
+    <select id="rg-tipo-periodo">
+      <option value="mes">Por mes</option>
+      <option value="anio">Por año</option>
+      <option value="rango">Rango</option>
+    </select>
+    <div id="rg-ctrl-mes">
+      <select id="rg-mes-mes" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+      <select id="rg-mes-anio" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+      </select>
+      <input type="hidden" id="rg-mes"/>
+    </div>
+    <div id="rg-ctrl-anio" style="display:none">
+      <input type="number" id="rg-anio" min="2020" max="2030" style="width:80px"/>
+    </div>
+    <div id="rg-ctrl-rango" style="display:none">
+      <input type="date" id="rg-desde"/>
+      <span>→</span>
+      <input type="date" id="rg-hasta"/>
+    </div>
+  </div>
+  <div class="perf-export-bar">
+    <span class="perf-export-lbl">Exportar reporte:</span>
+    <button class="btn-export-xlsx" id="rg-export-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+    <button class="btn-export-pdf"  id="rg-export-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+  </div>
+  <div class="dlg-scroll" id="rg-contenido">
+    <div class="perf-empty">Seleccioná un grupo para ver el reporte</div>
+  </div>
+</dialog>
+
+<!-- MODAL CONFIGURACIÓN -->
+<dialog id="modal-config">
+  <div class="dlg-hdr">
+    <div><h2><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Configuración</h2><p>Ciclo lectivo y opciones — año <span id="cfg-anio-lbl"></span></p></div>
+    <button class="btn-x" id="xconfig">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <div class="section-lbl" style="margin-bottom:.75rem"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Ciclo lectivo</div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Inicio del ciclo</label>
+        <input type="date" id="cfg-ciclo-inicio"/>
+      </div>
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Fin del ciclo</label>
+        <input type="date" id="cfg-ciclo-fin"/>
+      </div>
+    </div>
+    <div style="margin-top:.5rem;font-size:.75rem;color:#6B7280">
+      El ciclo lectivo define el período para calcular % de asistencia anual en las fichas de cada estudiante.
+    </div>
+    <div class="divider" style="margin:1.25rem 0"></div>
+    <div class="section-lbl" style="margin-bottom:.75rem"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Cierre de ciclo lectivo</div>
+    <div style="font-size:.78rem;color:#6B7280;margin-bottom:.75rem">Al cerrar el ciclo, se archivan todas las novedades del año y se limpian para comenzar el nuevo ciclo. Los horarios y datos de los estudiantes se mantienen.</div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:.5rem">
+      <select id="cfg-ciclo-anio-cerrar" style="font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:.35rem .6rem;font-size:.78rem"></select>
+      <button class="btn-danger" id="cfg-cerrar-ciclo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Archivar y cerrar ciclo</button>
+    </div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.75rem">
+      <select id="cfg-backup-anio" style="font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:.35rem .6rem;font-size:.78rem"></select>
+      <button class="btn-s" id="cfg-backup-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Backup Excel</button>
+      <button class="btn-s" id="cfg-backup-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Backup PDF</button>
+    </div>
+    <div id="cfg-ciclos-archivados"></div>
+    <div class="divider" style="margin:1.25rem 0"></div>
+    <div class="section-lbl" style="margin-bottom:.75rem">🎌 Feriados</div>
+    <div style="font-size:.78rem;color:#6B7280;margin-bottom:.75rem">Agregá los feriados nacionales para excluirlos del cálculo de presentes.</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem">
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <input type="date" id="cfg-feriado-fecha" style="font-family:inherit;flex:1;min-width:120px"/>
+        <span style="font-size:.75rem;color:#6B7280">hasta</span>
+        <input type="date" id="cfg-feriado-hasta" style="font-family:inherit;flex:1;min-width:120px"/>
+        <span style="font-size:.7rem;color:#9CA3AF">(mismo día si es feriado simple)</span>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <input type="text" id="cfg-feriado-nombre" placeholder="Nombre (ej: Receso invernal)" style="font-family:inherit;flex:1;border:1.5px solid var(--border);border-radius:8px;padding:.35rem .6rem;font-size:.78rem"/>
+        <button class="btn-p" id="cfg-feriado-add">Agregar</button>
+      </div>
+    </div>
+    <div id="cfg-feriados-lista"></div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-s" id="cfg-cancelar">Cancelar</button>
+    <button class="btn-p" id="cfg-guardar">💾 Guardar</button>
+  </div>
+</dialog>
+
+<!-- MODAL GRUPOS -->
+<dialog id="modal-grupos">
+  <div class="dlg-hdr">
+    <div><h2>Gestión de grupos</h2><p>Crear y administrar grupos</p></div>
+    <button class="btn-x" id="xgrupos">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <div class="grupo-nuevo">
+      <input type="text" id="grupo-nuevo-nombre" placeholder="Nombre del grupo (ej: 1° Año Enfermería)" maxlength="40"/>
+      <input type="color" id="grupo-nuevo-color" value="#2563EB" title="Color del grupo"/>
+      <button class="btn-p" id="grupo-nuevo-btn">Crear</button>
+    </div>
+    <div id="grupos-lista"></div>
+  </div>
+</dialog>
+
+<!-- MODAL EXPORT DÍA -->
+<dialog id="modal-export-dia">
+  <div class="dlg-hdr">
+    <div><h2>Exportar asistencia</h2><p id="export-subtit">Configurá el reporte</p></div>
+    <button class="btn-x" id="xexport">✕</button>
+  </div>
+  <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.9rem;">
+    <div class="field">
+      <label>Tipo de reporte</label>
+      <select id="export-tipo-reporte" style="font-family:inherit">
+        <option value="dia">Por día — todos los estudiantes ese día</option>
+        <option value="docente">Por estudiante — historial en un período</option>
+        
+      </select>
+    </div>
+    <div class="field">
+      <label>Filtrar por nivel</label>
+      <select id="export-nivel" style="font-family:inherit">
+        <option value="estudiantes">🎓 Estudiantes</option>
+      </select>
+    </div>
+    <div class="field" id="export-area-field" style="display:none">
+      <label id="export-area-label">Filtrar por área</label>
+      <select id="export-area" style="font-family:inherit">
+        <option value="">Todas las áreas</option>
+      </select>
+    </div>
+    <div id="export-ctrl-dia">
+      <div class="field">
+        <label>Período</label>
+        <select id="export-dia-periodo" style="font-family:inherit">
+          <option value="dia">Un día específico</option>
+          <option value="mes">Por mes</option>
+          <option value="anio">Por año</option>
+          <option value="rango">Rango personalizado</option>
+        </select>
+      </div>
+      <div id="export-dia-ctrl-dia">
+        <div class="field"><label>Fecha</label><input type="date" id="export-fecha" style="font-family:inherit"/></div>
+      </div>
+      <div id="export-dia-ctrl-mes" style="display:none">
+        <div class="field"><label>Mes</label><input type="month" id="export-dia-mes" style="font-family:inherit"/></div>
+      </div>
+      <div id="export-dia-ctrl-anio" style="display:none">
+        <div class="field"><label>Año</label><input type="number" id="export-dia-anio" min="2024" max="2030" style="width:90px;font-family:inherit"/></div>
+      </div>
+      <div id="export-dia-ctrl-rango" style="display:none;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <div class="field"><label>Desde</label><input type="date" id="export-dia-desde" style="font-family:inherit"/></div>
+        <div class="field"><label>Hasta</label><input type="date" id="export-dia-hasta" style="font-family:inherit"/></div>
+      </div>
+    </div>
+    <div id="export-ctrl-estudiante" style="display:none;flex-direction:column;gap:.7rem;">
+      <div class="field">
+        <label>Estudiante</label>
+        <select id="export-estudiante-sel" style="font-family:inherit">
+          <option value="">— Seleccioná un estudiante —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Período</label>
+        <select id="export-periodo-tipo" style="font-family:inherit">
+          <option value="mes">Por mes</option>
+          <option value="anio">Por año</option>
+          <option value="rango">Rango personalizado</option>
+        </select>
+      </div>
+      <div id="export-ctrl-mes">
+        <input type="month" id="export-mes" style="font-family:inherit"/>
+      </div>
+      <div id="export-ctrl-anio" style="display:none">
+        <input type="number" id="export-anio" min="2020" max="2030" value="2026" style="width:90px;font-family:inherit"/>
+      </div>
+      <div id="export-ctrl-rango" style="display:none;gap:.5rem;align-items:center;">
+        <input type="date" id="export-desde" style="font-family:inherit"/>
+        <span>→</span>
+        <input type="date" id="export-hasta" style="font-family:inherit"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:.75rem;">
+      <button class="btn-export-xlsx" id="export-dia-excel" style="flex:1;padding:.75rem;font-size:.85rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+      <button class="btn-export-pdf"  id="export-dia-pdf"   style="flex:1;padding:.75rem;font-size:.85rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL RANKING -->
+<dialog id="modal-ranking">
+  <div class="dlg-hdr">
+    <div>
+      <h2>Ranking de ausentismo</h2>
+      <p id="rank-subtit">Por total de ausencias</p>
+    </div>
+    <button class="btn-x" id="xrank">✕</button>
+  </div>
+  <div class="perf-periodo-bar">
+    <select id="rank-tipo-periodo">
+      <option value="dia">Por día</option>
+      <option value="mes">Por mes</option>
+      <option value="anio">Por año</option>
+      <option value="rango">Rango personalizado</option>
+    </select>
+    <div id="rank-ctrl-dia">
+      <input type="date" id="rank-dia"/>
+    </div>
+    <div id="rank-ctrl-mes" style="display:none">
+      <select id="rank-mes-mes" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+<select id="rank-mes-anio" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)"><option value="2026" selected>2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option><option value="2041">2041</option><option value="2042">2042</option><option value="2043">2043</option><option value="2044">2044</option><option value="2045">2045</option><option value="2046">2046</option><option value="2047">2047</option><option value="2048">2048</option><option value="2049">2049</option><option value="2050">2050</option></select>
+      <input type="hidden" id="rank-mes"/>
+    </div>
+    <div id="rank-ctrl-anio" style="display:none">
+      <input type="number" id="rank-anio" min="2020" max="2030" style="width:80px"/>
+    </div>
+    <div id="rank-ctrl-rango" style="display:none">
+      <input type="date" id="rank-desde"/>
+      <span>→</span>
+      <input type="date" id="rank-hasta"/>
+    </div>
+  </div>
+  <div class="perf-export-bar">
+    <span class="perf-export-lbl">Exportar ranking:</span>
+    <button class="btn-export-xlsx" id="rank-export-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+    <button class="btn-export-pdf"  id="rank-export-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+  </div>
+  <div class="dlg-scroll" id="rank-lista">
+    <div class="perf-loading">Cargando…</div>
+  </div>
+</dialog>
+
+<!-- MODAL REGISTRO MASIVO -->
+<dialog id="modal-masivo">
+  <div class="dlg-hdr">
+    <div>
+      <h2>Registro masivo</h2>
+      <p id="mas-subtit">Seleccioná estudiantes y elegí el estado</p>
+    </div>
+    <button class="btn-x" id="xmas">✕</button>
+  </div>
+  <div class="mas-fecha-bar">
+    <span class="mas-fecha-lbl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Fecha:</span>
+    <input type="date" id="mas-fecha-input"/>
+    <button id="mas-btn-hoy" class="btn-hoy-mas">Hoy</button>
+  </div>
+  <div class="mas-toolbar">
+    <div class="mas-toolbar-left">
+      <label class="mas-check-all">
+        <input type="checkbox" id="mas-sel-todos"/> Seleccionar todos
+      </label>
+      <span id="mas-count" class="mas-count">0 seleccionados</span>
+    </div>
+    <div class="mas-filtro-wrap">
+      <span class="buscador-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input type="text" id="mas-buscador" placeholder="Buscar…" autocomplete="off"/>
+    </div>
+  </div>
+  <div class="dlg-scroll" id="mas-lista"></div>
+  <div class="mas-footer">
+    <div class="mas-estados" id="mas-estados"></div>
+    <div class="mas-footer-btns">
+      <button class="btn-sec" id="mas-cancelar">Cancelar</button>
+      <button class="btn-p" id="mas-guardar" disabled>Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL PERFIL / HISTORIAL -->
+<dialog id="modal-perfil">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="perf-nom">Estudiante</h2>
+      <p id="perf-cargo">Cargo</p>
+    </div>
+    <button class="btn-x" id="xperf">✕</button>
+  </div>
+  <div class="perf-periodo-bar">
+    <select id="perf-tipo-periodo">
+      <option value="anio">Por año</option>
+      <option value="mes">Por mes</option>
+      <option value="rango">Rango personalizado</option>
+    </select>
+    <div id="ctrl-anio">
+      <input type="number" id="perf-anio" min="2020" max="2030" value="2025" style="width:80px"/>
+    </div>
+    <div id="ctrl-mes" style="display:none">
+      <input type="month" id="perf-mes"/>
+    </div>
+    <div id="ctrl-rango" style="display:none">
+      <input type="date" id="perf-desde"/>
+      <span>→</span>
+      <input type="date" id="perf-hasta"/>
+    </div>
+  </div>
+  <div class="perf-export-bar">
+    <span class="perf-export-lbl">Exportar historial:</span>
+    <button class="btn-export-xlsx" id="perf-export-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+    <button class="btn-export-pdf"  id="perf-export-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+  </div>
+  <div class="dlg-scroll" id="perf-historial">
+    <div class="perf-loading">Cargando…</div>
+  </div>
+</dialog>
+
+<!-- MODAL NOVEDAD -->
+<dialog id="modal-novedad">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="mn-nom">Estudiante</h2>
+      <p id="mn-car">Cargo</p>
+    </div>
+    <button class="btn-x" id="xnov">✕</button>
+  </div>
+  <div class="nov-fecha-bar">
+    <span class="nov-fecha-lbl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Fecha:</span>
+    <input type="date" id="nov-fecha-input"/>
+    <button id="nov-btn-hoy">Hoy</button>
+  </div>
+  <div id="nov-horario-dia"></div>
+  <div id="nov-parcial-bar" style="display:none" class="nov-parcial-wrap">
+    <span class="nov-dur-lbl">⚠️ ¿Es falta parcial?</span>
+    <label><input type="radio" name="nov-parcial" value="completa" checked> Falta completa del día</label>
+    <label><input type="radio" name="nov-parcial" value="parcial"> Uno o más módulos</label>
+    <div id="nov-parcial-modulos" style="display:none;margin-top:.4rem;width:100%">
+      <div style="font-size:.72rem;color:#6B7280;margin-bottom:.3rem">Seleccioná los módulos que faltó (podés marcar más de uno):</div>
+      <div id="nov-modulos-lista" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+    </div>
+  </div>
+  <div id="nov-adelanto-bar" style="display:none" class="nov-adelanto-wrap">
+    <span class="nov-dur-lbl">⏩ Adelanto:</span>
+    <span>¿Qué día compensa?</span>
+    <input type="date" id="nov-adelanto-compensa"/>
+    <span style="font-size:.7rem;color:#6B7280">(opcional)</span>
+    <div class="nov-dur-btns">
+      <button class="btn-sec btn-sm" id="nov-ade-cancelar">Cancelar</button>
+      <button class="btn-p  btn-sm" id="nov-ade-confirmar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirmar
+      </button>
+    </div>
+  </div>
+  <div id="nov-duracion-bar" style="display:none" class="nov-duracion-wrap">
+    <div class="nov-dur-tipo-lbl">📅 <strong id="nov-dur-tipo-nombre"></strong></div>
+    <label><input type="radio" name="nov-dur-tipo" value="dia" checked> Solo este día</label>
+    <label><input type="radio" name="nov-dur-tipo" value="rango"> Rango de fechas</label>
+    <label><input type="radio" name="nov-dur-tipo" value="dias"> Cantidad de días hábiles</label>
+    <div id="nov-dur-rango" style="display:none">
+      <span>Hasta:</span><input type="date" id="nov-dur-hasta"/>
+    </div>
+    <div id="nov-dur-cant" style="display:none">
+      <input type="number" id="nov-dur-dias" min="1" max="365" value="1" style="width:60px"/> días hábiles
+    </div>
+    <div id="nov-comentario-bar" style="width:100%;margin-top:.4rem">
+      <label style="font-size:.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.2rem">Comentario / motivo (opcional)</label>
+      <textarea id="nov-comentario" rows="2" placeholder="Ej: presentó certificado médico, reunión institucional..."
+        style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.4rem .7rem;
+               font-family:inherit;font-size:.8rem;color:var(--primary);resize:vertical;outline:none;
+               transition:border-color .15s"></textarea>
+    </div>
+    <div class="nov-dur-btns">
+      <button class="btn-sec btn-sm" id="nov-dur-cancelar">Cancelar</button>
+      <button class="btn-p  btn-sm" id="nov-dur-confirmar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirmar
+      </button>
+    </div>
+  </div>
+
+
+
+<div id="nov-estado-bar"></div>
+<div class="nov-grid" id="nov-grid"></div>
+</dialog>
+
+<!-- MODAL ESTUDIANTE -->
+<dialog id="modal-docente">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="mde-tit">Nuevo estudiante</h2>
+      <p id="mde-sub">Completá los datos</p>
+    </div>
+    <button class="btn-x" id="xdoc">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <input type="hidden" id="mde-id"/>
+    <!-- Campos ocultos requeridos por app.js -->
+    <input type="hidden" id="mde-jubilado" value=""/>
+    <input type="hidden" id="mde-materias" value=""/>
+    <input type="hidden" name="mde-tipo-hs" value="catedra"/>
+    <div id="mde-nivel-field-wrap" style="display:none">
+      <div class="field">
+        <div class="nivel-radio-group"><label class="nivel-radio-opt"><input type="radio" name="mde-nivel" value="estudiantes" checked/><span>🎓 Estudiantes</span></label></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem">
+      <div class="field" style="flex:1">
+        <label>Apellido/s</label>
+        <input id="mde-apellido" type="text" placeholder="Ej: González"/>
+      </div>
+      <div class="field" style="flex:1.4">
+        <label>Nombre/s</label>
+        <input id="mde-nom" type="text" placeholder="Ej: María José"/>
+      </div>
+    </div>
+    <div class="field" id="mde-area-field">
+      <label id="mde-area-label">Carrera</label>
+      <select id="mde-area" style="font-family:inherit;width:100%;padding:.45rem .6rem;border:1.5px solid var(--border,#e5e7eb);border-radius:8px;font-size:.83rem;background:var(--card-bg,#fff);color:var(--txt)">
+        <option value="">— Seleccioná la carrera —</option>
+        <option value="enfermeria">Tec. Sup. en Enfermería</option>
+        <option value="prof_inicial">Prof. de Educación Inicial</option>
+        <option value="prof_primaria">Prof. de Educación Primaria</option>
+        <option value="admin">Tec. Sup. en Administración</option>
+        <option value="marketing">Tec. Sup. en Marketing Digital</option>
+        <option value="software">Tec. Sup. en Desarrollo de Software</option>
+        <option value="agropecuaria">Tec. Sup. en Maq. y Equipos Agropecuarios</option>
+        <option value="fullstack">Tec. Univ. en Programación Full Stack</option>
+        <option value="mkt_negocios">Tec. Univ. en Marketing y Negocios Digitales</option>
+        <option value="prof_quimica">Profesorado Sec. en Química</option>
+        <option value="prof_biologia">Profesorado Sec. en Biología</option>
+        <option value="prof_exactas">Profesorado Univ. en Cs. Exactas y Naturales</option>
+        <option value="lic_admin">Lic. en Administración de Empresas</option>
+        <option value="lic_higiene">Lic. en Higiene y Seguridad</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Año cursado</label>
+      <select id="mde-car" style="font-family:inherit;width:100%;padding:.45rem .6rem;border:1.5px solid var(--border,#e5e7eb);border-radius:8px;font-size:.83rem;background:var(--card-bg,#fff);color:var(--txt)">
+        <option value="">— Seleccioná el año —</option>
+        <option value="1° Año">1° Año</option>
+        <option value="2° Año">2° Año</option>
+        <option value="3° Año">3° Año</option>
+        <option value="4° Año">4° Año</option>
+        <option value="5° Año">5° Año</option>
+      </select>
+    </div>
+    <div class="field" style="display:none">
+      <label>Horario de cursado <span style="font-size:.72rem;color:#9ca3af;font-weight:400">(opcional)</span></label>
+      <input id="mde-horario-est" type="text" placeholder="Ej: Lunes y Miércoles 19:00–22:00"/>
+      <p style="font-size:.7rem;color:#9ca3af;margin:.2rem 0 0">Se completa automáticamente para el año de esa carrera si ya fue definido.</p>
+    </div>
+    <!-- Campos ocultos requeridos por app.js -->
+    <input type="hidden" id="mde-fm" value="0"/>
+    <input type="hidden" id="mde-fa" value="0"/>
+    <input type="hidden" id="mde-notas" value=""/>
+    <div id="mde-grupos-sel" style="display:none"></div>
+    <div id="horario-editor" style="display:none"></div>
+    <div id="hs-preview" style="display:none"></div>
+  </div>
+  <div class="dlg-footer">
+    <div id="mde-left"></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="canceldoc">Cancelar</button>
+      <button class="btn-p"   id="savedoc">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL CONFIRMAR -->
+<dialog id="modal-confirm">
+  <div class="dlg-hdr">
+    <div><h2>Confirmar eliminación</h2></div>
+    <button class="btn-x" id="xconf">✕</button>
+  </div>
+  <div class="confirm-body">
+    <div class="ci">⚠️</div>
+    <p>¿Eliminás a <strong id="conf-nom"></strong>?<br>Esta acción no se puede deshacer.</p>
+    <div class="confirm-btns">
+      <button class="btn-sec"    id="conf-cancel">Cancelar</button>
+      <button class="btn-danger" id="conf-ok">Sí, eliminar</button>
+    </div>
+  </div>
+</dialog>
+
+
+<!-- MODAL IMPORTAR EXCEL -->
+<dialog id="modal-importar">
+  <div class="dlg-hdr">
+    <div><h2>Importar archivo</h2><p>Excel (.xlsx), Word (.docx) o PDF (.pdf)</p></div>
+    <button class="btn-x" id="ximportar">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem;background:#F3F4F6;border-radius:10px;padding:4px">
+      <button id="imp-modo-estudiantes" class="imp-modo-btn imp-modo-activo">👤 Importar estudiantes</button>
+      <button id="imp-modo-registros" class="imp-modo-btn">📋 Importar registros</button>
+    </div>
+    <div id="imp-panel-estudiantes">
+      <div class="imp-instrucciones">
+        <div class="imp-titulo">Columnas reconocidas (Excel) o campos (Word):</div>
+        <div class="imp-cols">
+          <span class="imp-col req">Nombre</span><span class="imp-col req">Apellido</span>
+          <span class="imp-col opt">Cargo</span><span class="imp-col opt">Materias</span>
+          <span class="imp-col opt">Grupo</span><span class="imp-col opt">Notas</span>
+          <span class="imp-col opt">Lunes entrada / salida</span><span class="imp-col opt">Martes entrada / salida</span>
+          <span class="imp-col opt">Miercoles entrada / salida</span><span class="imp-col opt">Jueves entrada / salida</span>
+          <span class="imp-col opt">Viernes entrada / salida</span>
+        </div>
+        <p class="imp-nota">Verde = obligatorio. Para Word: cada estudiante en un párrafo con formato <strong>Apellido, Nombre | Cargo | Materias</strong>.</p>
+      </div>
+      <div class="imp-drop-zone" id="imp-drop-zone">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p>Arrastrá tu archivo .xlsx, .docx o .pdf acá<br><span>o hacé click para seleccionar</span></p>
+        <input type="file" id="imp-file-input" accept=".xlsx,.xls,.docx,.pdf" style="display:none"/>
+      </div>
+      <div id="imp-preview" style="display:none">
+        <div class="imp-preview-header">
+          <span id="imp-preview-count"></span>
+          <div class="imp-preview-acciones">
+            <label class="imp-check-wrap"><input type="checkbox" id="imp-sobreescribir"/> Sobreescribir si ya existe</label>
+          </div>
+        </div>
+        <div class="rg-tabla-wrap"><table class="rg-tabla" id="imp-tabla">
+          <thead><tr><th></th><th>Apellido</th><th>Nombre</th><th>Cargo</th><th>Materias</th><th>Horario</th></tr></thead>
+          <tbody id="imp-tbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+    <div id="imp-panel-registros" style="display:none">
+      <div class="imp-instrucciones">
+        <div class="imp-titulo">Importar desde un reporte PDF de asistencia</div>
+        <p class="imp-nota">Subí un PDF exportado por esta app. Se cargan todas las novedades y se crean los estudiantes que no existan.</p>
+      </div>
+      <div class="imp-drop-zone" id="imp-drop-zone-reg">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <p>Arrastrá el PDF de reporte acá<br><span>o hacé click para seleccionar</span></p>
+        <input type="file" id="imp-file-reg" accept=".pdf" style="display:none"/>
+      </div>
+      <div id="imp-reg-preview" style="display:none">
+        <div id="imp-reg-resumen" style="background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:.7rem 1rem;font-size:.82rem;color:#3730A3;margin-bottom:.8rem"></div>
+        <div id="imp-reg-lista" style="display:flex;flex-direction:column;gap:.4rem;max-height:35vh;overflow-y:auto"></div>
+      </div>
+      <div id="imp-reg-progreso" style="display:none;padding:1rem 0">
+        <div id="imp-reg-prog-txt" style="font-size:.85rem;color:#374151;margin-bottom:.6rem">Importando...</div>
+        <div style="background:#E0E7FF;border-radius:99px;height:7px;overflow:hidden">
+          <div id="imp-reg-prog-bar" style="background:linear-gradient(90deg,#4F46E5,#6366F1);height:100%;width:0%;transition:width .3s"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <div></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="imp-cancelar">Cancelar</button>
+      <button class="btn-p" id="imp-guardar" disabled>Importar estudiantes</button>
+      <button class="btn-p" id="imp-guardar-reg" style="display:none" disabled>Confirmar importación</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL TENDENCIAS -->
+<dialog id="modal-tendencias">
+  <div class="dlg-hdr">
+    <div><h2>Tendencias de ausentismo</h2><p id="tend-subtit">Evolución mensual del año</p></div>
+    <button class="btn-x" id="xtend">✕</button>
+  </div>
+  <div class="perf-periodo-bar" style="flex-wrap:wrap;gap:.5rem">
+    <select id="tend-anio"></select>
+    <select id="tend-grupo"><option value="">Todos los grupos</option></select>
+    <select id="tend-vista">
+      <option value="anual">📊 Vista anual</option>
+      <option value="mes">📅 Por mes</option>
+    </select>
+    <div id="tend-ctrl-mes" style="display:none">
+      <select id="tend-mes-sel" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+    </div>
+  </div>
+  <div class="dlg-scroll" id="tend-contenido">
+    <div class="perf-loading">Cargando…</div>
+  </div>
+</dialog>
+
+
+<!-- MODAL DUPLICADO ESTUDIANTE -->
+<dialog id="modal-duplicado">
+  <div class="dlg-hdr">
+    <div><h2>⚠️ Estudiante duplicado</h2><p>Ya existe un estudiante con ese nombre</p></div>
+  </div>
+  <div class="confirm-body">
+    <div class="ci">👤</div>
+    <p>Ya hay un estudiante registrado como:</p>
+    <p style="font-size:1rem;font-weight:800;color:var(--primary);margin:.5rem 0" id="dup-nombre-existente"></p>
+    <p style="font-size:.8rem;color:var(--muted)" id="dup-cargo-existente"></p>
+    <p style="margin-top:.75rem;font-size:.82rem">¿Qué querés hacer?</p>
+    <div class="confirm-btns" style="flex-direction:column;gap:.4rem">
+      <button class="btn-p"       id="dup-editar">Editar el existente</button>
+      <button class="btn-sec"     id="dup-igual">Guardar igual como nuevo</button>
+      <button class="btn-danger"  id="dup-cancelar">Cancelar</button>
+    </div>
+  </div>
+</dialog>
+
+
+<!-- MODAL ELIMINAR MASIVO -->
+<dialog id="modal-eliminar-masivo">
+  <div class="dlg-hdr">
+    <div><h2>Eliminar estudiantes</h2><p id="elim-count">0 seleccionados</p></div>
+    <button class="btn-x" onclick="document.getElementById('modal-eliminar-masivo').close()">✕</button>
+  </div>
+  <div class="dlg-scroll" style="gap:.3rem">
+    <div style="display:flex;align-items:center;gap:.5rem;padding:.25rem 0;border-bottom:1px solid var(--border);margin-bottom:.25rem">
+      <input type="checkbox" id="elim-sel-todos"/>
+      <label for="elim-sel-todos" style="font-size:.8rem;font-weight:600;cursor:pointer">Seleccionar todos</label>
+    </div>
+    <div id="elim-lista"></div>
+  </div>
+  <div class="dlg-footer">
+    <div></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="elim-cancelar">Cancelar</button>
+      <button class="btn-danger" id="elim-confirmar" disabled>Eliminar seleccionados</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast-c"></div>
+
+<!-- MODAL AÑO NUEVO -->
+<dialog id="modal-anio-nuevo">
+  <div class="dlg-hdr">
+    <div>
+      <h2>📅 Año <span id="man-anio-nuevo"></span></h2>
+      <p>Este año no tiene estudiantes cargados aún</p>
+    </div>
+  </div>
+  <div class="man-body">
+    <div class="man-icon">🎉</div>
+    <p>¿Querés copiar los estudiantes de <strong><span id="man-anio-ant"></span></strong> a este año?</p>
+    <p class="man-sub">Se copian nombre, cargo, horario, grupos y materias.<br>Las faltas y novedades <strong>empiezan desde cero</strong>.</p>
+    <div class="man-btns">
+      <button class="btn-sec" id="man-cancelar">Cancelar</button>
+      <button class="btn-sec" id="man-vacio">Empezar vacío</button>
+      <button class="btn-p"   id="man-copiar">Sí, copiar estudiantes</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL JUBILADOS -->
+<dialog id="modal-retirados">
+  <div class="dlg-hdr">
+    <div>
+      <h2>📋 Estudiantes retirados</h2>
+      <p>Estudiantes retirados — podés consultar su perfil e historial</p>
+    </div>
+    <button class="btn-x" id="xjubilados">✕</button>
+  </div>
+  <div class="dlg-scroll" id="retirados-lista"></div>
+</dialog>
+
+<!-- MODAL COPIAR ESTUDIANTES -->
+
+<!-- MODAL LEGAJO DIGITAL -->
+<dialog id="modal-legajo">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="leg-tit">Legajo</h2>
+      <p id="leg-sub"></p>
+    </div>
+    <button class="btn-x" id="xleg">✕</button>
+  </div>
+  <div class="dlg-scroll" style="gap:.9rem">
+    <input type="hidden" id="leg-novedadId"/>
+    <div class="field">
+      <label>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        N° de trámite / referencia CIDI
+      </label>
+      <input id="leg-referencia" type="text" placeholder="Ej: EXP-2025-00012345-GDEBA-MEC"/>
+    </div>
+    <div class="field">
+      <label>Observaciones adicionales</label>
+      <textarea id="leg-comentario-ext" rows="3"
+        placeholder="Ej: Presentó certificado en secretaría el 15/05, aprobado por directivo..."
+        style="border:1.5px solid var(--border);border-radius:10px;padding:.52rem .85rem;font-family:inherit;font-size:.87rem;color:var(--primary);outline:none;resize:vertical;width:100%;transition:border-color .15s"></textarea>
+    </div>
+    <div class="divider"></div>
+    <div class="field">
+      <label>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        Adjuntar archivo (PDF, imagen)
+      </label>
+      <div id="leg-adjunto-actual"></div>
+      <div class="leg-file-zone" id="leg-file-zone" onclick="document.getElementById('leg-file-input').click()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Hacé click para seleccionar un archivo</span>
+        <small>PDF, JPG, PNG — máx. 5 MB</small>
+      </div>
+      <input type="file" id="leg-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display:none"/>
+      <div class="leg-file-preview" id="leg-file-preview" style="display:none">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        <span id="leg-file-nombre"></span>
+        <button onclick="document.getElementById('leg-file-input').value='';document.getElementById('leg-file-preview').style.display='none'" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:.8rem">✕</button>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <div></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="leg-cancelar">Cancelar</button>
+      <button class="btn-p"   id="leg-guardar">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>window.NIVEL_ACTIVO = 'estudiantes';</script>
+<!-- Firebase SDK (NO modular, versión compat para evitar problemas de import) -->
+<!-- Firebase Storage -->
+<!-- PDF.js para leer PDFs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- mammoth para Word (.docx) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<!-- SheetJS para Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- jsPDF para PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+
+
+
+  <!-- MODAL PAPELERA -->
+  <dialog id="modal-papelera" style="border:none;border-radius:16px;padding:0;max-width:520px;width:95%;box-shadow:0 8px 40px rgba(0,0,0,.2);">
+    <div style="background:linear-gradient(135deg,#B91C1C,#DC2626);padding:.9rem 1.2rem;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between">
+      <span style="color:#fff;font-weight:700;font-size:.95rem;">♻️ Papelera — Estudiantes eliminados</span>
+      <button id="xpapelera" onclick="document.getElementById('modal-papelera').close()" style="background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div style="padding:1.2rem 1.4rem;background:#fff;max-height:60vh;overflow-y:auto">
+      <p style="font-size:.78rem;color:#6B7280;margin:0 0 .8rem">Los estudiantes eliminados pueden ser restaurados sin perder sus registros.</p>
+      <div id="pap-lista"><p style="color:#9ca3af;font-size:.85rem;">Cargando...</p></div>
+    </div>
+  </dialog>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  CARRERAS — estudiantes.html
+// ══════════════════════════════════════════════════════
+var CARRERAS = [
+  { id:'enfermeria',    label:'Tecnicatura Superior en Enfermería',           tipo:'Tec. Superior',      anios:3 },
+  { id:'prof_inicial',  label:'Profesorado de Educación Inicial',             tipo:'Profesorado',        anios:4 },
+  { id:'prof_primaria', label:'Profesorado de Educación Primaria',            tipo:'Profesorado',        anios:4 },
+  { id:'admin',         label:'Tec. Sup. en Administración',                  tipo:'Tec. Superior',      anios:3 },
+  { id:'marketing',     label:'Tec. Sup. en Marketing Digital',               tipo:'Tec. Superior',      anios:3 },
+  { id:'software',      label:'Tec. Sup. en Desarrollo de Software',          tipo:'Tec. Superior',      anios:3 },
+  { id:'agropecuaria',  label:'Tec. Sup. en Maq. y Equipos Agropecuarios',   tipo:'Tec. Superior',      anios:3 },
+  { id:'fullstack',     label:'Tec. Univ. en Programación Full Stack',        tipo:'Tec. Universitaria', anios:3 },
+  { id:'mkt_negocios',  label:'Tec. Univ. en Marketing y Negocios Digitales', tipo:'Tec. Universitaria', anios:3 },
+  { id:'prof_quimica',  label:'Profesorado Sec. en Química',                  tipo:'Profesorado',        anios:4 },
+  { id:'prof_biologia', label:'Profesorado Sec. en Biología',                 tipo:'Profesorado',        anios:4 },
+  { id:'prof_exactas',  label:'Profesorado Univ. en Cs. Exactas y Naturales', tipo:'Profesorado',        anios:4 },
+  { id:'lic_admin',     label:'Lic. en Administración de Empresas',           tipo:'Licenciatura',       anios:5 },
+  { id:'lic_higiene',   label:'Lic. en Higiene y Seguridad',                  tipo:'Licenciatura',       anios:5 }
+];
+
+var CARRERA_ACTIVA = null;
+var ANIO_ACTIVO    = '';
+
+function mostrarCarreraScreen(){
+  CARRERA_ACTIVA = null;
+  ANIO_ACTIVO    = '';
+  window.FILTRO_ANIO_CARRERA = '';
+  document.getElementById('carrera-screen').style.display    = '';
+  document.getElementById('carrera-breadcrumb').style.display = 'none';
+  document.querySelector('main').style.display               = 'none';
+  // También ocultar el header summary y vista-toggle
+  var vt = document.getElementById('vista-toggle'); if(vt) vt.style.display='none';
+  var cw = document.getElementById('cal-wrap');     if(cw) cw.style.display='none';
+  renderCarreraGrid();
+}
+
+function volverACarreras(){
+  var sel = document.getElementById('filtro-area');
+  if(sel){ sel.value=''; sel.dispatchEvent(new Event('change')); }
+  CARRERA_ACTIVA = null;
+  ANIO_ACTIVO    = '';
+  window.FILTRO_ANIO_CARRERA = '';
+  mostrarCarreraScreen();
+  // Carga rápida de conteos
+  cargarConteoEstudiantes();
+  // Asistencia completa con delay
+  if(typeof calcularAsistenciaDiaria === 'function') setTimeout(calcularAsistenciaDiaria, 400);
+}
+
+function renderCarreraGrid(){
+  var grid = document.getElementById('carrera-grid');
+  if(!grid) return;
+  var counts = {};
+  if(window.TODOS_DOCENTES){
+    TODOS_DOCENTES.forEach(function(d){
+      if(d.area) counts[d.area] = (counts[d.area]||0)+1;
+    });
+  }
+  grid.innerHTML = CARRERAS.map(function(c){
+    var n = counts[c.id]||0;
+    return '<div class="carrera-card" data-carrera-id="'+c.id+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+      +'<div class="carrera-card-tipo">'+c.tipo+'</div>'
+      +'<button class="btn-cfg-carrera" data-cfg-id="'+c.id+'" title="Horarios de esta carrera" style="background:none;border:none;cursor:pointer;padding:.1rem .3rem;font-size:.8rem;color:#9ca3af;border-radius:6px;display:'+(window.ROL==='admin'?'inline':'none')+'">⚙️</button>'
+      +'</div>'
+      +'<div class="carrera-card-titulo">'+c.label+'</div>'
+      +'<div class="carrera-card-count">'+n+' estudiante'+(n!==1?'s':'')+'</div>'
+      +'</div>';
+  }).join('');
+  grid.querySelectorAll('.carrera-card').forEach(function(card){
+    card.addEventListener('click', function(e){
+      var cfgBtn = e.target.closest('.btn-cfg-carrera');
+      if(cfgBtn){ abrirConfigHorarios(cfgBtn.dataset.cfgId); return; }
+      seleccionarCarrera(card.dataset.carreraId);
+    });
+  });
+}
+
+function seleccionarCarrera(carreraId){
+  var carrera = CARRERAS.find(function(c){ return c.id===carreraId; });
+  if(!carrera) return;
+  CARRERA_ACTIVA = carreraId;
+  ANIO_ACTIVO    = '';
+  window.FILTRO_ANIO_CARRERA = '';
+
+  document.getElementById('carrera-screen').style.display    = 'none';
+  document.getElementById('carrera-breadcrumb').style.display = 'flex';
+  document.querySelector('main').style.display               = '';
+  var vt = document.getElementById('vista-toggle'); if(vt) vt.style.display='';
+
+  document.getElementById('carrera-bc-nombre').textContent = carrera.label;
+
+  // Generar tabs de año según la carrera
+  var ORDINAL = ['','1°','2°','3°','4°','5°'];
+  var numAnios = carrera.anios || 3;
+  var tabsEl = document.getElementById('anio-tabs');
+  tabsEl.innerHTML = '';
+  // Botón "Todos los años"
+  var btnTodos = document.createElement('button');
+  btnTodos.className = 'anio-tab activo';
+  btnTodos.dataset.anio = '';
+  btnTodos.textContent = 'Todos los años';
+  tabsEl.appendChild(btnTodos);
+  for(var i = 1; i <= numAnios; i++){
+    var btn = document.createElement('button');
+    btn.className = 'anio-tab';
+    btn.dataset.anio = String(i);
+    btn.textContent = ORDINAL[i]+' Año';
+    tabsEl.appendChild(btn);
+  }
+  // Re-enlazar eventos a las nuevas tabs
+  tabsEl.querySelectorAll('.anio-tab').forEach(function(b){
+    b.addEventListener('click', function(){
+      tabsEl.querySelectorAll('.anio-tab').forEach(function(t){ t.classList.remove('activo'); });
+      b.classList.add('activo');
+      ANIO_ACTIVO = b.dataset.anio;
+      aplicarFiltroAnio();
+      actualizarBadgesContexto();
+    });
+  });
+
+  // Aplicar filtro de área directamente (el <select> puede no tener esta
+  // carrera como <option> si todavía no tiene estudiantes cargados)
+  window.filtroArea = carreraId;
+  var selArea = document.getElementById('filtro-area');
+  if(selArea && [].some.call(selArea.options, function(o){ return o.value === carreraId; })){
+    selArea.value = carreraId;
+  }
+  if(window.aplicarFiltros) aplicarFiltros();
+  if(window.renderGrid) renderGrid();
+  actualizarBadgesContexto();
+}
+
+function aplicarFiltroAnio(){
+  window.FILTRO_ANIO_CARRERA = ANIO_ACTIVO;
+  if(window.renderGrid) renderGrid();
+}
+
+// Actualiza los badges del header (% HOY, PRES., AUS., TOTAL)
+// según el contexto: todos / carrera / carrera+año
+function actualizarBadgesContexto(){
+  var estudiantes = window._cacheEstudiantes || [];
+  if(!estudiantes.length) return;
+
+  var filtrados = estudiantes;
+
+  // Filtrar por carrera activa
+  if(CARRERA_ACTIVA){
+    filtrados = filtrados.filter(function(e){ return e.area === CARRERA_ACTIVA; });
+  }
+  // Filtrar por año activo
+  if(ANIO_ACTIVO){
+    filtrados = filtrados.filter(function(e){
+      var anioEst = (e.cargo||'').charAt(0);
+      return anioEst === ANIO_ACTIVO;
+    });
+  }
+
+  // Calcular presentes/ausentes usando los ausentesHoy del último cálculo
+  var ausentesHoy = window._cacheAusentesHoy || {};
+  var total = filtrados.length;
+  var ausentes = filtrados.filter(function(e){ return ausentesHoy[e.id]; }).length;
+  var presentes = total - ausentes;
+  var pct = total > 0 ? Math.round(presentes / total * 100) : null;
+
+  var elP   = document.getElementById('cnt-p');
+  var elJ   = document.getElementById('cnt-j');
+  var elT   = document.getElementById('cnt-tot');
+  var elPct = document.getElementById('pct-hoy-est') || document.getElementById('pct-hoy');
+  if(elP)   elP.textContent   = presentes;
+  if(elJ)   elJ.textContent   = ausentes;
+  if(elT)   elT.textContent   = total;
+  if(elPct) elPct.textContent = pct !== null ? pct+'%' : '—';
+}
+
+// Tabs de año — los listeners se crean dinámicamente en seleccionarCarrera()
+document.addEventListener('DOMContentLoaded', function(){
+  // Mostrar pantalla de carreras apenas carga la página
+  // Esperamos a que app.js defina mostrarApp y lo interceptamos
+  var _checkInterval = setInterval(function(){
+    if(typeof mostrarApp === 'function' && typeof cargarYRender === 'function'){
+      clearInterval(_checkInterval);
+
+      var _origMostrarApp = mostrarApp;
+      mostrarApp = function(user){
+        _origMostrarApp(user);
+        setTimeout(function(){
+          mostrarCarreraScreen();
+          // Primero carga rápida de conteos, luego asistencia completa
+          cargarConteoEstudiantes();
+          calcularAsistenciaDiaria && setTimeout(calcularAsistenciaDiaria, 800);
+        }, 100);
+      };
+
+      var _origCargarYRender = cargarYRender;
+      cargarYRender = function(){
+        var result = _origCargarYRender.apply(this, arguments);
+        if(result && typeof result.then === 'function'){
+          result.then(function(){
+            if(!CARRERA_ACTIVA){
+              renderCarreraGrid();
+              cargarConteoEstudiantes();
+              calcularAsistenciaDiaria && setTimeout(calcularAsistenciaDiaria, 600);
+            }
+          });
+        }
+        return result;
+      };
+    }
+  }, 50);
+});
+</script>
+
+
+
+<script>
+// ══════════════════════════════════════════════════════
+//  ASISTENCIA DIARIA COMPLETA — estudiantes.html
+// ══════════════════════════════════════════════════════
+var TIPOS_AUSENCIA_EST = ['justificada','injustificada','justificada_parcial','injustificada_parcial'];
+
+function hoyStrEst(){
+  var d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function mesActualStr(){
+  var d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function clsP(pct){
+  if(pct===null||pct===undefined) return 'sin';
+  if(pct>=80) return 'alta'; if(pct>=60) return 'media'; return 'baja';
+}
+function diasHabilesHasta(desde, hasta){
+  var count=0, d=new Date(desde);
+  while(d<=hasta){ var dw=d.getDay(); if(dw>=1&&dw<=5) count++; d.setDate(d.getDate()+1); }
+  return count;
+}
+
+var _cacheEstudiantes = null;
+var _cacheNovedades   = null;
+
+// Carga rápida solo para contar estudiantes por carrera — sin novedades
+function cargarConteoEstudiantes(){
+  var anio = window.ANIO_SEL || new Date().getFullYear();
+  supaFetch('GET','docentes','nivel=eq.estudiantes&anio=eq.'+anio)
+    .then(function(rows){
+      _cacheEstudiantes = rows || [];
+      window._cacheAusentesHoy = window._cacheAusentesHoy || {};
+      // Actualizar conteos en cards de carrera
+      var counts = {};
+      _cacheEstudiantes.forEach(function(d){
+        if(d.area) counts[d.area] = (counts[d.area]||0)+1;
+      });
+      document.querySelectorAll('.carrera-card').forEach(function(card){
+        var id = card.dataset.carreraId;
+        var n = counts[id]||0;
+        var el = card.querySelector('.carrera-card-count');
+        if(el) el.textContent = n+' estudiante'+(n!==1?'s':'');
+      });
+      // Actualizar badge TOTAL del header
+      var elT = document.getElementById('cnt-tot');
+      if(elT && !CARRERA_ACTIVA) elT.textContent = _cacheEstudiantes.length;
+    }).catch(function(){});
+}
+
+function calcularAsistenciaDiaria(){
+  var panel = document.getElementById('asistencia-diaria-panel');
+  var tabla = document.getElementById('asistencia-diaria-tabla');
+  var fechaLabel = document.getElementById('asistencia-fecha-label');
+  if(!panel||!tabla) return;
+
+  var hoy   = hoyStrEst();
+  var partes = hoy.split('-');
+  if(fechaLabel) fechaLabel.textContent = partes[2]+'/'+partes[1]+'/'+partes[0];
+  panel.style.display = '';
+  tabla.innerHTML = '<div class="asist-loading">Calculando asistencia...</div>';
+
+  var anio = window.ANIO_SEL || new Date().getFullYear();
+  var iniMes  = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  var iniAnio = new Date(new Date().getFullYear(), 2, 1);
+  var hoyDate2 = new Date();
+  var diasMes  = Math.max(1, diasHabilesHasta(iniMes,  hoyDate2));
+  var diasAnio2= Math.max(1, diasHabilesHasta(iniAnio, hoyDate2));
+
+  Promise.all([
+    supaFetch('GET', 'docentes', 'nivel=eq.estudiantes&anio=eq.'+anio),
+    supaFetch('GET', 'novedades', 'fecha=eq.'+hoy+'&anio=eq.'+anio)
+  ]).then(function(res){
+    var estudiantes = res[0]||[];
+    var novedadesHoy = res[1]||[];
+    _cacheEstudiantes = estudiantes;
+
+    // Mapa ausentes hoy
+    var ausentesHoy = {};
+    novedadesHoy.forEach(function(n){
+      if(TIPOS_AUSENCIA_EST.indexOf(n.tipo)>=0) ausentesHoy[n.docente_id]=true;
+    });
+    window._cacheAusentesHoy = ausentesHoy;
+
+    // Totales generales del día
+    var totalGen=0, presentesGen=0, ausentesGen=0;
+    estudiantes.forEach(function(e){
+      totalGen++;
+      if(ausentesHoy[e.id]) ausentesGen++; else presentesGen++;
+    });
+    var pctGen = totalGen>0 ? Math.round(presentesGen/totalGen*100) : null;
+
+    // Actualizar badges del header según contexto actual
+    actualizarBadgesContexto();
+
+    // Resumen general
+    var htmlResumen = '<div class="carrera-resumen-header">'
+      +'<div class="resumen-badge pres"><span class="rb-val">'+presentesGen+'</span><span class="rb-lbl">Presentes</span></div>'
+      +'<div class="resumen-badge aus"><span class="rb-val">'+ausentesGen+'</span><span class="rb-lbl">Ausentes</span></div>'
+      +'<div class="resumen-badge total"><span class="rb-val">'+totalGen+'</span><span class="rb-lbl">Total</span></div>'
+      +'<div class="resumen-badge pct"><span class="rb-val">'+(pctGen!==null?pctGen+'%':'—')+'</span><span class="rb-lbl">Asistencia hoy</span></div>'
+      +'</div>';
+
+    // Agrupar por carrera + año
+    var grupos = {};
+    CARRERAS.forEach(function(c){ grupos[c.id]={}; });
+    estudiantes.forEach(function(est){
+      var car = est.area||''; var anioEst = (est.cargo||'').charAt(0);
+      if(!car||!grupos[car]) return;
+      if(!grupos[car][anioEst]) grupos[car][anioEst]={total:0,presentes:0,ausentes:0,faltasMes:0,faltasAnio:0};
+      grupos[car][anioEst].total++;
+      if(ausentesHoy[est.id]){ grupos[car][anioEst].ausentes++; }
+      else { grupos[car][anioEst].presentes++; }
+      grupos[car][anioEst].faltasMes  += est.faltasMes||0;
+      grupos[car][anioEst].faltasAnio += est.faltasAnio||0;
+    });
+
+    // Actualizar % en cards de carrera del grid
+    CARRERAS.forEach(function(c){
+      var card = document.querySelector('.carrera-card[data-carrera-id="'+c.id+'"]');
+      if(!card) return;
+      var aniosC = grupos[c.id];
+      var tot=0, pres=0;
+      Object.keys(aniosC).forEach(function(a){ tot+=aniosC[a].total; pres+=aniosC[a].presentes; });
+      var pct = tot>0 ? Math.round(pres/tot*100) : null;
+      var cls = clsP(pct);
+      // Quitar badge anterior si existe
+      var old = card.querySelector('.carrera-pct-hoy'); if(old) old.remove();
+      var badge = document.createElement('div');
+      badge.className = 'carrera-pct-hoy '+cls;
+      badge.textContent = pct!==null ? pct+'% asistencia hoy' : 'Sin estudiantes';
+      card.appendChild(badge);
+    });
+
+    // Tabla de detalle por carrera y año
+    var htmlTabla = '';
+    var hayDatos = false;
+    CARRERAS.forEach(function(c){
+      var aniosC = grupos[c.id];
+      var aniosCon = Object.keys(aniosC).filter(function(a){ return aniosC[a].total>0; });
+      if(!aniosCon.length) return;
+      hayDatos = true;
+
+      var totC=0,presC=0,ausC=0;
+      aniosCon.forEach(function(a){ totC+=aniosC[a].total; presC+=aniosC[a].presentes; ausC+=aniosC[a].ausentes; });
+      var pctC = totC>0 ? Math.round(presC/totC*100) : null;
+      var clsC = clsP(pctC);
+
+      htmlTabla += '<div class="asist-carrera-bloque">';
+      htmlTabla += '<div class="asist-carrera-header">'
+        +'<span class="asist-carrera-nombre">'+c.label+'</span>'
+        +'<span class="asist-carrera-pct '+clsC+'">'+(pctC!==null?pctC+'% hoy':'Sin datos')+'</span>'
+        +'</div>';
+      htmlTabla += '<table class="asist-anios-tabla">';
+      htmlTabla += '<thead><tr>'
+        +'<th>Año</th>'
+        +'<th>Presentes</th>'
+        +'<th>Ausentes</th>'
+        +'<th>Total</th>'
+        +'<th>% Hoy</th>'
+        +'<th>% Mes</th>'
+        +'<th>% Año</th>'
+        +'</tr></thead><tbody>';
+
+      ['1','2','3','4'].forEach(function(a){
+        var g = aniosC[a]; if(!g||g.total===0) return;
+        var pctHoy = Math.round(g.presentes/g.total*100);
+        var pctMes  = Math.max(0, Math.round((diasMes *g.total - g.faltasMes) /diasMes /g.total*100));
+        var pctAnio2= Math.max(0, Math.round((diasAnio2*g.total - g.faltasAnio)/diasAnio2/g.total*100));
+        var cH=clsP(pctHoy), cM=clsP(pctMes), cA=clsP(pctAnio2);
+        htmlTabla += '<tr>'
+          +'<td><strong>'+a+'° Año</strong></td>'
+          +'<td style="color:#166534;font-weight:700">'+g.presentes+'</td>'
+          +'<td style="color:#991b1b;font-weight:700">'+g.ausentes+'</td>'
+          +'<td style="color:#374151">'+g.total+'</td>'
+          +'<td><span style="font-weight:700;color:'+(cH==='alta'?'#166534':cH==='media'?'#854d0e':'#991b1b')+'">'+pctHoy+'%</span></td>'
+          +'<td><span style="font-weight:700;color:'+(cM==='alta'?'#166534':cM==='media'?'#854d0e':'#991b1b')+'">'+pctMes+'%</span></td>'
+          +'<td><span style="font-weight:700;color:'+(cA==='alta'?'#166534':cA==='media'?'#854d0e':'#991b1b')+'">'+pctAnio2+'%</span></td>'
+          +'</tr>';
+      });
+      htmlTabla += '</tbody></table></div>';
+    });
+
+    if(!hayDatos) htmlTabla = '<div class="asist-loading">No hay estudiantes cargados aún.</div>';
+    tabla.innerHTML = htmlResumen + htmlTabla;
+
+  }).catch(function(err){
+    tabla.innerHTML = '<div class="asist-loading">Error: '+err.message+'</div>';
+  });
+}
+
+var _asistTimer = null;
+var _origMostrarCarreraScreen2 = null;
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){
+    var _orig = window.mostrarCarreraScreen;
+    if(_orig){
+      window.mostrarCarreraScreen = function(){
+        _orig();
+        clearTimeout(_asistTimer);
+        _asistTimer = setTimeout(calcularAsistenciaDiaria, 300);
+      };
+    }
+  }, 300);
+});
+</script>
+
+
+
+<script>
+// ══════════════════════════════════════════════════════
+//  buildCard OVERRIDE para NIVEL estudiantes
+// ══════════════════════════════════════════════════════
+// Sobreescribe buildCard cuando NIVEL_ACTIVO = 'estudiantes'
+// Card simplificada: nombre, carrera, año, presente/ausente, % asistencia
+
+(function(){
+var _orig = window.buildCard;
+
+// Carreras label map
+var CARRERA_LABEL = {
+  enfermeria:'Tec. Sup. en Enfermería', prof_inicial:'Prof. de Ed. Inicial',
+  prof_primaria:'Prof. de Ed. Primaria', admin:'Tec. Sup. en Administración',
+  marketing:'Tec. Sup. en Marketing Digital', software:'Tec. Sup. en Des. de Software',
+  agropecuaria:'Tec. Sup. en Maq. y Eq. Agropecuarios', fullstack:'Tec. Univ. Programación Full Stack',
+  mkt_negocios:'Tec. Univ. Marketing y Negocios Digitales', prof_quimica:'Prof. Sec. en Química',
+  prof_biologia:'Prof. Sec. en Biología', prof_exactas:'Prof. Univ. Cs. Exactas y Naturales',
+  lic_admin:'Lic. en Administración de Empresas', lic_higiene:'Lic. en Higiene y Seguridad'
+};
+
+window.buildCard = function(doc){
+  if(window.NIVEL_ACTIVO !== 'estudiantes') return _orig ? _orig(doc) : null;
+
+  // Estado: ausente si tiene novedad de ausencia hoy, presente si no
+  var est = doc.estadoHoy || '';
+  var esAusente = est && est !== 'presente' && est !== '';
+  var esFeriadoHoy = typeof esFeriado === 'function' && esFeriado(fechaSeleccionada);
+
+  // Calcular % asistencia — usar días lunes-viernes del ciclo
+  var fm = doc.faltasMesCalc !== undefined ? doc.faltasMesCalc : (doc.faltasMes || 0);
+  var fa = doc.faltasAnioCalc !== undefined ? doc.faltasAnioCalc : (doc.faltasAnio || 0);
+
+  // Días hábiles transcurridos (lun-vie) en el mes y en el año
+  function diasHabilesHasta(desde, hasta){
+    var count=0, d=new Date(desde);
+    while(d<=hasta){ var dw=d.getDay(); if(dw>=1&&dw<=5) count++; d.setDate(d.getDate()+1); }
+    return count;
+  }
+  var hoy2 = hoyDate ? hoyDate() : new Date();
+  var iniMes  = new Date(hoy2.getFullYear(), hoy2.getMonth(), 1);
+  var iniAnio = new Date(hoy2.getFullYear(), 2, 1); // 1 marzo
+  var diasMes  = Math.max(1, diasHabilesHasta(iniMes,  hoy2));
+  var diasAnio = Math.max(1, diasHabilesHasta(iniAnio, hoy2));
+
+  var pctMes  = Math.max(0, Math.round((diasMes  - fm) / diasMes  * 100));
+  var pctAnio = Math.max(0, Math.round((diasAnio - fa) / diasAnio * 100));
+
+  function colorPct(p){ return p>=80?'#22c55e':p>=60?'#eab308':'#ef4444'; }
+  function badgeEst(pct, lbl){
+    var c=colorPct(pct);
+    return '<div class="pct-badge-est" style="background:'+c+'18;border:1px solid '+c+'44">'
+      +'<span style="font-size:.62rem;color:#6b7280;font-weight:600">'+lbl+'</span>'
+      +'<span style="font-size:.85rem;font-weight:800;color:'+c+'">'+pct+'%</span>'
+      +'</div>';
+  }
+
+  // Estado chip simplificado
+  var chipHTML;
+  if(esFeriadoHoy){
+    chipHTML = '<span class="estado-chip feriado-chip">Feriado</span>';
+  } else if(esAusente){
+    chipHTML = '<span class="estado-chip justificada">Ausente</span>';
+  } else if(est === 'presente'){
+    chipHTML = '<span class="estado-chip presente">Presente</span>';
+  } else {
+    chipHTML = '<span class="estado-chip sin-reg" style="background:#f1f5f9;color:#94a3b8;border:1px solid #e2e8f0">Sin registro</span>';
+  }
+
+  // Nombre
+  var nombre = (doc.apellido && doc.apellido.trim())
+    ? doc.apellido.trim().toUpperCase() + ', ' + (doc.nombre||'')
+    : (doc.nombre||'—');
+
+  // Carrera + año
+  var carreraLabel = CARRERA_LABEL[doc.area] || (doc.area||'');
+  var anioLabel    = doc.cargo || '';
+
+  // Card element
+  var card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id       = doc.id;
+  card.dataset.jubilado = '';
+  card.dataset.nivel    = doc.nivel || 'estudiantes';
+  card.dataset.area     = doc.area  || '';
+  card.dataset.cargo    = doc.cargo || '';
+  card.dataset.estado   = esFeriadoHoy ? 'feriado' : (esAusente ? est : 'presente');
+  card.dataset.nombre   = nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  card.dataset.grupos   = (doc.grupos||[]).join(',');
+  card.dataset.diasSemana = '1,2,3,4,5'; // lun-vie siempre
+  card.dataset.turno    = 'noche';
+
+  card.innerHTML =
+    '<div class="card-header-top">' +
+      '<div class="card-name">' + nombre + '</div>' +
+      '<div class="card-cargo" style="font-size:.75rem;color:#6b7280;margin-top:.15rem">' +
+        (carreraLabel ? carreraLabel : '') +
+        (anioLabel    ? ' · <strong>' + anioLabel + '</strong>' : '') +
+      '</div>' +
+      '<div class="badges-row" style="margin-top:.5rem;display:flex;gap:.4rem">' +
+        badgeEst(pctMes,  'MES') + badgeEst(pctAnio, 'AÑO') +
+      '</div>' +
+    '</div>' +
+    '<div class="card-top">' +
+      '<div class="card-actions">' +
+        '<button class="btn-card btn-card-hist" data-action="historial">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil' +
+        '</button>' +
+        (ROL==='admin'
+          ? '<button class="btn-card btn-card-nov" data-action="novedad">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Registrar' +
+            '</button>' +
+            '<button class="btn-card btn-card-edit" data-action="editar">✏️ Editar</button>' +
+            '<button class="btn-card btn-card-del"  data-action="eliminar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>'
+          : '') +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:.5rem">' +
+      chipHTML +
+      '<span style="font-size:.61rem;color:#9CA3AF">' + fa + ' falta' + (fa!==1?'s':'') + ' anuales</span>' +
+    '</div>';
+
+  card.querySelector('[data-action="historial"]').addEventListener('click', function(e){
+    e.stopPropagation(); abrirPerfil(doc);
+  });
+  if(ROL==='admin'){
+    var btnNov = card.querySelector('[data-action="novedad"]');
+    var btnEdi = card.querySelector('[data-action="editar"]');
+    var btnDel = card.querySelector('[data-action="eliminar"]');
+    if(btnNov) btnNov.addEventListener('click', function(e){ e.stopPropagation(); abrirNovedad(doc); });
+    if(btnEdi) btnEdi.addEventListener('click', function(e){ e.stopPropagation(); abrirDocente(doc); });
+    if(btnDel) btnDel.addEventListener('click', function(e){ e.stopPropagation(); abrirConfirm(doc); });
+  }
+  return card;
+};
+})();
+
+// CSS extra para badges de % de estudiantes
+var _estStyle = document.createElement('style');
+_estStyle.textContent = '.pct-badge-est{display:flex;flex-direction:column;align-items:center;padding:.25rem .5rem;border-radius:8px;min-width:3rem;}';
+document.head.appendChild(_estStyle);
+</script>
+
+<script>
+// Override abrirPerfil para estudiantes: corrige "0/undefined"
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      if(window.NIVEL_ACTIVO !== 'estudiantes') return;
+      var _origPerfil = window.abrirPerfil;
+      window.abrirPerfil = function(doc){
+        if(_origPerfil) _origPerfil(doc);
+        // Parchear el círculo de asistencia después de que app.js lo renderice
+        setTimeout(function(){
+          var anio = window.ANIO_SEL || new Date().getFullYear();
+          var hoy2 = new Date();
+          var iniAnio = new Date(hoy2.getFullYear(), 2, 1);
+          function dhh(desde, hasta){ var c=0,d=new Date(desde); while(d<=hasta){if(d.getDay()>=1&&d.getDay()<=5)c++;d.setDate(d.getDate()+1);} return c; }
+          var totalDias = Math.max(1, dhh(iniAnio, hoy2));
+
+          supaFetch && supaFetch('GET','novedades','docente_id=eq.'+doc.id+'&anio=eq.'+anio+'&tipo=eq.justificada')
+            .then(function(rows){
+              var faltas = (rows||[]).length;
+              var presentes = Math.max(0, totalDias - faltas);
+              var pct = Math.round(presentes/totalDias*100);
+
+              // Reemplazar los dos círculos que muestran "0/undefined"
+              var circles = document.querySelectorAll('.perf-pct-circle, .perf-circle');
+              circles.forEach(function(c){
+                var valEl = c.querySelector('.perf-pct-val, .pct-val, strong');
+                if(valEl && valEl.textContent && valEl.textContent.indexOf('undefined') >= 0){
+                  valEl.textContent = presentes+'/'+totalDias;
+                }
+                var pctEl = c.querySelector('.perf-pct-label, .pct-label, small');
+                if(pctEl) pctEl.textContent = pct+'%';
+              });
+              // También parchear texto plano con undefined
+              document.querySelectorAll('.perf-stats span, .perf-pct span').forEach(function(el){
+                if(el.textContent.indexOf('undefined') >= 0){
+                  el.textContent = el.textContent.replace(/\d+\/undefined/g, presentes+'/'+totalDias);
+                }
+              });
+            }).catch(function(){});
+        }, 400);
+      };
+    }, 300);
+  });
+})();
+</script>
+
+
+<script>
+// Simplificar modal de novedad para estudiantes: solo Presente / Ausente
+(function(){
+  var _origAbrirNovedad = window.abrirNovedad;
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      if(window.NIVEL_ACTIVO !== 'estudiantes') return;
+
+      var _orig = window.abrirNovedad;
+      window.abrirNovedad = function(doc){
+        if(_orig) _orig(doc);
+        // Ocultar todos los botones de tipo excepto presente y ausente (justificada)
+        setTimeout(function(){
+          var btns = document.querySelectorAll('.nov-btn');
+          btns.forEach(function(btn){
+            var tipo = btn.dataset.tipo || btn.getAttribute('data-tipo') || '';
+            if(tipo !== 'presente' && tipo !== 'justificada' && tipo !== '') {
+              btn.style.display = 'none';
+            }
+          });
+          // Cambiar el label de justificada por "Ausente"
+          var btnJust = document.querySelector('.nov-btn[data-tipo="justificada"]');
+          if(btnJust){
+            var span = btnJust.querySelector('span');
+            if(span) span.textContent = 'Ausente';
+            else btnJust.textContent = 'Ausente';
+          }
+        }, 50);
+      };
+    }, 200);
+  });
+})();
+</script>
+
+
+<script>
+// Listener botón horarios de carrera
+document.addEventListener('DOMContentLoaded', function(){
+  var btnH = document.getElementById('btn-horarios-carrera');
+  if(btnH) btnH.addEventListener('click', function(){
+    // Cerrar dropdown
+    document.querySelectorAll('.hdr-dropdown').forEach(function(d){ d.classList.remove('open'); });
+    // Mostrar modal de selección de carrera para configurar horarios
+    abrirSelectorCarrerasConfig();
+  });
+});
+
+// Interceptar el mensaje vacío "No hay docentes" → "No hay estudiantes"
+document.addEventListener('DOMContentLoaded', function(){
+  var observer = new MutationObserver(function(){
+    var grid = document.getElementById('grid');
+    if(!grid) return;
+    if(grid.innerHTML.indexOf('Nuevo docente') !== -1){
+      grid.innerHTML = grid.innerHTML
+        .replace(/\+ Nuevo docente/g, '+ Nuevo estudiante')
+        .replace(/No hay docentes/g, 'No hay estudiantes')
+        .replace(/Nuevo docente/g, 'Nuevo estudiante');
+    }
+  });
+  var grid = document.getElementById('grid');
+  if(grid) observer.observe(grid, { childList: true, subtree: true, characterData: true });
+});
+</script>
+
+
+<script>
+// Auto-completar carrera y año al abrir modal desde una carrera seleccionada
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      var _origAbrirDocente = window.abrirDocente;
+      window.abrirDocente = function(doc){
+        if(_origAbrirDocente) _origAbrirDocente(doc);
+        // Si viene de una carrera seleccionada y es nuevo estudiante, pre-llenar
+        setTimeout(function(){
+          var selArea = document.getElementById('mde-area');
+          var selAnio = document.getElementById('mde-car');
+          if(!doc && window.CARRERA_ACTIVA){
+            if(selArea && !selArea.value) selArea.value = window.CARRERA_ACTIVA;
+          }
+          if(!doc && window.ANIO_ACTIVO){
+            var anioMap = {'1':'1° Año','2':'2° Año','3':'3° Año','4':'4° Año','5':'5° Año'};
+            if(selAnio && !selAnio.value && anioMap[window.ANIO_ACTIVO]){
+              selAnio.value = anioMap[window.ANIO_ACTIVO];
+            }
+          }
+          // Disparar render de materias con los valores actuales
+          var carreraId = selArea ? selArea.value : '';
+          var anioVal   = selAnio ? selAnio.value : '';
+          var anioNum   = anioVal.match(/(\d)/);
+          var anio      = anioNum ? anioNum[1] : '';
+          if(typeof mdeRenderMaterias === 'function'){
+            mdeRenderMaterias(carreraId, anio, doc ? (doc.materiasestado||{}) : {});
+          }
+        }, 80);
+      };
+    }, 300);
+  });
+})();
+</script>
+
+
+<!-- ══════════════════════════════════════════════════════
+     ESTILOS — editor de materias por carrera
+     ══════════════════════════════════════════════════════ -->
+<style>
+/* ── Modal materias ─────────────────────────────── */
+#modal-materias-carrera { width: min(720px, 96vw); max-height: 92vh; }
+
+.mc-anio-tabs {
+  display: flex;
+  gap: .35rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.mc-anio-tab {
+  padding: .32rem .85rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  font-size: .76rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  color: var(--txt);
+  font-family: inherit;
+  transition: all .15s;
+}
+.mc-anio-tab.activo {
+  background: var(--nivel-color, #059669);
+  border-color: var(--nivel-color, #059669);
+  color: #fff;
+}
+
+/* ── Lista de materias ──────────────────────────── */
+.mc-materia-item {
+  background: var(--card-bg, #fff);
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: .75rem .9rem;
+  margin-bottom: .5rem;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.mc-materia-top {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.mc-materia-nombre {
+  flex: 1;
+  font-size: .83rem;
+  font-weight: 700;
+  color: var(--txt);
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  outline: none;
+  padding: .2rem 0;
+  border-bottom: 1.5px solid transparent;
+  transition: border-color .15s;
+  min-width: 0;
+}
+.mc-materia-nombre:focus {
+  border-bottom-color: var(--nivel-color, #059669);
+}
+.mc-materia-nombre::placeholder { color: #d1d5db; font-weight: 400; }
+.mc-btn-del-mat {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef4444;
+  font-size: .9rem;
+  padding: .2rem;
+  border-radius: 6px;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: .6;
+  transition: opacity .15s;
+}
+.mc-btn-del-mat:hover { opacity: 1; }
+
+/* ── Días/horarios de la materia ────────────────── */
+.mc-materia-horarios {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  padding-left: .1rem;
+}
+.mc-dia-row {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-wrap: wrap;
+}
+.mc-dia-check {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .76rem;
+  font-weight: 600;
+  color: var(--txt);
+  min-width: 80px;
+  cursor: pointer;
+  user-select: none;
+}
+.mc-dia-check input[type=checkbox] {
+  accent-color: var(--nivel-color, #059669);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.mc-hora-inputs {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: .74rem;
+  color: var(--txt-muted, #6b7280);
+}
+.mc-hora-inputs input[type=time] {
+  font-family: inherit;
+  font-size: .76rem;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 6px;
+  padding: .18rem .35rem;
+  color: var(--txt);
+  background: var(--card-bg, #fff);
+  width: 84px;
+  cursor: pointer;
+}
+.mc-hora-inputs input[type=time]:focus {
+  outline: none;
+  border-color: var(--nivel-color, #059669);
+}
+.mc-hora-disabled {
+  opacity: .35;
+  pointer-events: none;
+}
+
+/* ── Botón agregar materia ──────────────────────── */
+.mc-btn-add {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  background: none;
+  border: 1.5px dashed var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: .65rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--txt-muted, #6b7280);
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+  transition: border-color .15s, color .15s;
+  margin-top: .25rem;
+}
+.mc-btn-add:hover {
+  border-color: var(--nivel-color, #059669);
+  color: var(--nivel-color, #059669);
+}
+
+/* ── Resumen horario de materia ─────────────────── */
+.mc-materia-resumen {
+  font-size: .7rem;
+  color: var(--txt-muted, #9ca3af);
+  font-style: italic;
+  margin-top: .05rem;
+}
+
+/* ── Empty state ────────────────────────────────── */
+.mc-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--txt-muted, #9ca3af);
+  font-size: .82rem;
+}
+
+/* ══════════════════════════════════════════════════
+   MODAL SELECTOR DE MATERIAS en ficha de estudiante
+   ══════════════════════════════════════════════════ */
+#mde-materias-panel {
+  margin-top: .25rem;
+}
+.mde-mat-titulo {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--txt-muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: .45rem;
+}
+.mde-mat-item {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .65rem;
+  border: 1.5px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  margin-bottom: .35rem;
+  background: var(--card-bg, #fff);
+  flex-wrap: wrap;
+}
+.mde-mat-nombre {
+  flex: 1;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--txt);
+  min-width: 120px;
+}
+.mde-mat-horario-txt {
+  font-size: .68rem;
+  color: var(--txt-muted, #9ca3af);
+  flex-basis: 100%;
+  padding-left: .1rem;
+  margin-top: -.1rem;
+}
+.mde-mat-opciones {
+  display: flex;
+  gap: .25rem;
+  flex-shrink: 0;
+}
+.mde-mat-opt {
+  padding: .22rem .55rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--border, #e5e7eb);
+  font-size: .7rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  color: var(--txt-muted, #6b7280);
+  font-family: inherit;
+  transition: all .12s;
+  white-space: nowrap;
+}
+.mde-mat-opt:hover { border-color: #9ca3af; color: var(--txt); }
+.mde-mat-opt.sel-cursa    { background: #dcfce7; border-color: #86efac; color: #166534; }
+.mde-mat-opt.sel-virtual  { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+.mde-mat-opt.sel-equiv    { background: #fef9c3; border-color: #fde047; color: #854d0e; }
+.mde-mat-opt.sel-no       { background: #f3f4f6; border-color: #d1d5db; color: #6b7280; }
+.mde-mat-sin-datos {
+  font-size: .78rem;
+  color: var(--txt-muted, #9ca3af);
+  padding: .5rem 0;
+  font-style: italic;
+}
+</style>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL — configuración de materias por carrera/año
+     ══════════════════════════════════════════════════════ -->
+<dialog id="modal-materias-carrera">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="mc-titulo">Materias de la carrera</h2>
+      <p id="mc-sub" style="font-size:.78rem;color:#6b7280;margin:.2rem 0 0"></p>
+    </div>
+    <button class="btn-x" id="xmaterias">✕</button>
+  </div>
+
+  <div class="dlg-scroll" style="padding:1rem 1.1rem">
+    <!-- Tabs de año — se generan dinámicamente según la carrera -->
+    <div class="mc-anio-tabs" id="mc-anio-tabs"></div>
+
+    <!-- Lista de materias del año activo -->
+    <div id="mc-materias-lista"></div>
+
+    <!-- Botón agregar -->
+    <button class="mc-btn-add" id="mc-btn-add-materia">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Agregar materia
+    </button>
+  </div>
+
+  <div class="dlg-footer">
+    <div style="font-size:.72rem;color:#9ca3af">Los cambios aplican a todos los estudiantes de esta carrera.</div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="mc-cancel">Cancelar</button>
+      <button class="btn-p"   id="mc-guardar">Guardar materias</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL SELECTOR CARRERA PARA CONFIGURAR MATERIAS -->
+<dialog id="modal-sel-carrera-config">
+  <div class="dlg-hdr">
+    <div>
+      <h2>Materias por carrera</h2>
+      <p style="font-size:.78rem;color:#6b7280">Seleccioná una carrera para configurar sus materias</p>
+    </div>
+    <button class="btn-x" id="x-sel-carrera-cfg">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <div id="sel-carrera-config-lista" style="display:flex;flex-direction:column;gap:.4rem"></div>
+  </div>
+</dialog>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  SISTEMA DE MATERIAS POR CARRERA
+//  Almacena en config tabla Supabase con id='materias_carrera'
+//  Estructura: { carreraId: { '1': [ {id, nombre, horario:{lunes:{activo,entrada,salida},...}} ] } }
+// ══════════════════════════════════════════════════════
+
+var _materiasCarrera  = {};   // datos cargados de Supabase
+var _mcCarreraEdit    = null; // carrera que se está editando
+var _mcAnioEdit       = '1';  // año activo en el editor
+
+var MC_DIAS = ['lunes','martes','miercoles','jueves','viernes','sabado'];
+var MC_DIAS_LABEL = { lunes:'Lun', martes:'Mar', miercoles:'Mié', jueves:'Jue', viernes:'Vie', sabado:'Sáb' };
+
+// ── Persistencia ─────────────────────────────────────
+function mcCargarMaterias(){
+  return supaFetch('GET','config','id=eq.materias_carrera')
+    .then(function(rows){
+      if(rows && rows[0] && rows[0].data) _materiasCarrera = rows[0].data;
+    }).catch(function(){});
+}
+
+function mcGuardarMaterias(cb){
+  supaFetch('POST','config','on_conflict=id',{id:'materias_carrera', data:_materiasCarrera})
+    .catch(function(){
+      return supaFetch('PATCH','config','id=eq.materias_carrera',{data:_materiasCarrera});
+    })
+    .then(function(){ if(cb) cb(); })
+    .catch(function(e){ if(typeof toast==='function') toast('Error al guardar: '+e.message, 3000); });
+}
+
+// ── Helpers ──────────────────────────────────────────
+function mcGetMaterias(carreraId, anio){
+  return ((_materiasCarrera[carreraId]||{})[anio]) || [];
+}
+
+function mcGenId(){
+  return 'm_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+}
+
+function mcResumenHorario(horario){
+  if(!horario) return '';
+  var partes = [];
+  MC_DIAS.forEach(function(d){
+    var h = horario[d];
+    if(h && h.activo){
+      var txt = MC_DIAS_LABEL[d];
+      if(h.entrada && h.salida) txt += ' '+h.entrada+'–'+h.salida;
+      else if(h.entrada) txt += ' '+h.entrada;
+      partes.push(txt);
+    }
+  });
+  return partes.join(' · ');
+}
+
+// ── Renderizar editor de materias ────────────────────
+function mcRenderEditor(){
+  var lista = document.getElementById('mc-materias-lista');
+  if(!lista) return;
+  var mats = mcGetMaterias(_mcCarreraEdit, _mcAnioEdit);
+  if(!mats.length){
+    lista.innerHTML = '<div class="mc-empty">No hay materias cargadas para este año.<br>Usá el botón de abajo para agregar.</div>';
+    return;
+  }
+  lista.innerHTML = '';
+  mats.forEach(function(mat, idx){
+    var item = document.createElement('div');
+    item.className = 'mc-materia-item';
+    item.dataset.matIdx = idx;
+
+    // Fila superior: nombre + botón eliminar
+    var topRow = '<div class="mc-materia-top">'
+      +'<input class="mc-materia-nombre" type="text" placeholder="Nombre de la materia" value="'+mcEsc(mat.nombre||'')+'" data-idx="'+idx+'"/>'
+      +'<button class="mc-btn-del-mat" data-del-idx="'+idx+'" title="Eliminar materia">'
+        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>'
+      +'</button>'
+    +'</div>';
+
+    // Resumen horario
+    var resumen = mcResumenHorario(mat.horario);
+    var resumenHtml = resumen
+      ? '<div class="mc-materia-resumen">'+mcEsc(resumen)+'</div>'
+      : '';
+
+    // Filas de días
+    var diasHtml = '<div class="mc-materia-horarios">';
+    MC_DIAS.forEach(function(dia){
+      var h = (mat.horario && mat.horario[dia]) || {};
+      var checked  = h.activo ? 'checked' : '';
+      var disabled = h.activo ? '' : 'disabled';
+      var entrada  = h.entrada || '';
+      var salida   = h.salida  || '';
+      diasHtml += '<div class="mc-dia-row" data-mat-idx="'+idx+'" data-dia="'+dia+'">'
+        +'<label class="mc-dia-check">'
+          +'<input type="checkbox" class="mc-dia-chk" data-mat-idx="'+idx+'" data-dia="'+dia+'" '+checked+'>'
+          +MC_DIAS_LABEL[dia]
+        +'</label>'
+        +'<div class="mc-hora-inputs '+(h.activo?'':'mc-hora-disabled')+'" data-mat-idx="'+idx+'" data-dia="'+dia+'">'
+          +'<input type="time" class="mc-hora-entrada" value="'+entrada+'" '+disabled+' placeholder="Entrada">'
+          +'<span>→</span>'
+          +'<input type="time" class="mc-hora-salida"  value="'+salida+'"  '+disabled+' placeholder="Salida">'
+        +'</div>'
+      +'</div>';
+    });
+    diasHtml += '</div>';
+
+    item.innerHTML = topRow + resumenHtml + diasHtml;
+    lista.appendChild(item);
+  });
+
+  // Eventos nombre
+  lista.querySelectorAll('.mc-materia-nombre').forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var idx = parseInt(this.dataset.idx);
+      mcGetMaterias(_mcCarreraEdit, _mcAnioEdit)[idx].nombre = this.value;
+    });
+  });
+
+  // Eventos eliminar
+  lista.querySelectorAll('.mc-btn-del-mat').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var idx = parseInt(this.dataset.delIdx);
+      var mats = mcGetMaterias(_mcCarreraEdit, _mcAnioEdit);
+      mats.splice(idx, 1);
+      mcRenderEditor();
+    });
+  });
+
+  // Eventos checkbox días
+  lista.querySelectorAll('.mc-dia-chk').forEach(function(chk){
+    chk.addEventListener('change', function(){
+      var idx  = parseInt(this.dataset.matIdx);
+      var dia  = this.dataset.dia;
+      var mats = mcGetMaterias(_mcCarreraEdit, _mcAnioEdit);
+      if(!mats[idx].horario) mats[idx].horario = {};
+      if(!mats[idx].horario[dia]) mats[idx].horario[dia] = {};
+      mats[idx].horario[dia].activo = this.checked;
+      // Habilitar/deshabilitar inputs de hora
+      var row = this.closest('.mc-dia-row');
+      var horaDiv = row.querySelector('.mc-hora-inputs');
+      var inputs  = row.querySelectorAll('input[type=time]');
+      if(this.checked){
+        horaDiv.classList.remove('mc-hora-disabled');
+        inputs.forEach(function(i){ i.removeAttribute('disabled'); });
+      } else {
+        horaDiv.classList.add('mc-hora-disabled');
+        inputs.forEach(function(i){ i.setAttribute('disabled',''); });
+      }
+      // Actualizar resumen
+      var resumen = mcResumenHorario(mats[idx].horario);
+      var resEl = row.closest('.mc-materia-item').querySelector('.mc-materia-resumen');
+      if(resEl) resEl.textContent = resumen;
+      else if(resumen){
+        var top = row.closest('.mc-materia-item').querySelector('.mc-materia-top');
+        var d = document.createElement('div');
+        d.className = 'mc-materia-resumen';
+        d.textContent = resumen;
+        top.insertAdjacentElement('afterend', d);
+      }
+    });
+  });
+
+  // Eventos inputs de hora
+  lista.querySelectorAll('.mc-hora-entrada, .mc-hora-salida').forEach(function(inp){
+    inp.addEventListener('change', function(){
+      var row  = this.closest('.mc-dia-row');
+      var idx  = parseInt(row.dataset.matIdx);
+      var dia  = row.dataset.dia;
+      var mats = mcGetMaterias(_mcCarreraEdit, _mcAnioEdit);
+      if(!mats[idx].horario) mats[idx].horario = {};
+      if(!mats[idx].horario[dia]) mats[idx].horario[dia] = {};
+      var isEntrada = this.classList.contains('mc-hora-entrada');
+      if(isEntrada) mats[idx].horario[dia].entrada = this.value;
+      else           mats[idx].horario[dia].salida  = this.value;
+      // Actualizar resumen
+      var resumen = mcResumenHorario(mats[idx].horario);
+      var resEl = row.closest('.mc-materia-item').querySelector('.mc-materia-resumen');
+      if(resEl) resEl.textContent = resumen;
+    });
+  });
+}
+
+function mcEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Abrir config de una carrera ───────────────────
+function abrirConfigHorarios(carreraId){
+  var carrera = CARRERAS.find(function(c){ return c.id===carreraId; });
+  if(!carrera) return;
+  _mcCarreraEdit = carreraId;
+  _mcAnioEdit    = '1';
+  document.getElementById('mc-titulo').textContent = carrera.label;
+  document.getElementById('mc-sub').textContent    = carrera.tipo;
+
+  // Generar tabs según cantidad de años de la carrera
+  var numAnios = carrera.anios || 3;
+  var tabsEl = document.getElementById('mc-anio-tabs');
+  var ORDINAL = ['','1°','2°','3°','4°','5°'];
+  tabsEl.innerHTML = '';
+  for(var i = 1; i <= numAnios; i++){
+    var btn = document.createElement('button');
+    btn.className = 'mc-anio-tab' + (i === 1 ? ' activo' : '');
+    btn.dataset.mcAnio = String(i);
+    btn.textContent = ORDINAL[i] + ' Año';
+    tabsEl.appendChild(btn);
+  }
+
+  // Inicializar estructura si no existe
+  if(!_materiasCarrera[carreraId]) _materiasCarrera[carreraId] = {};
+  if(!_materiasCarrera[carreraId]['1']) _materiasCarrera[carreraId]['1'] = [];
+
+  mcRenderEditor();
+  var dlg = document.getElementById('modal-materias-carrera');
+  if(dlg && dlg.showModal) dlg.showModal(); else if(dlg) dlg.setAttribute('open','');
+}
+
+// ── Selector de carrera (desde menú) ─────────────
+function abrirSelectorCarrerasConfig(){
+  var lista = document.getElementById('sel-carrera-config-lista');
+  if(!lista) return;
+  lista.innerHTML = '';
+  CARRERAS.forEach(function(c){
+    var btn = document.createElement('button');
+    btn.style.cssText = 'text-align:left;padding:.7rem 1rem;border:1.5px solid var(--border,#e5e7eb);border-radius:10px;background:var(--card-bg,#fff);cursor:pointer;font-family:inherit;font-size:.83rem;width:100%;transition:border-color .15s';
+    btn.innerHTML = '<div style="font-size:.7rem;color:#6b7280;font-weight:600">'+c.tipo+'</div>'
+      +'<div style="font-weight:700;color:var(--txt)">'+c.label+'</div>';
+    btn.addEventListener('click', function(){
+      document.getElementById('modal-sel-carrera-config').close();
+      abrirConfigHorarios(c.id);
+    });
+    lista.appendChild(btn);
+  });
+  var dlg = document.getElementById('modal-sel-carrera-config');
+  if(dlg.showModal) dlg.showModal(); else dlg.setAttribute('open','');
+}
+
+// ── Guardar ──────────────────────────────────────
+function mcGuardar(){
+  if(!_mcCarreraEdit) return;
+  // Limpiar materias sin nombre
+  var mats = mcGetMaterias(_mcCarreraEdit, _mcAnioEdit);
+  _materiasCarrera[_mcCarreraEdit][_mcAnioEdit] = mats.filter(function(m){ return m.nombre && m.nombre.trim(); });
+  var btnG = document.getElementById('mc-guardar');
+  if(btnG){ btnG.disabled = true; btnG.textContent = 'Guardando…'; }
+  mcGuardarMaterias(function(){
+    if(btnG){ btnG.disabled = false; btnG.textContent = 'Guardar materias'; }
+    if(typeof toast==='function') toast('Materias guardadas ✓', 2000);
+    document.getElementById('modal-materias-carrera').close();
+  });
+}
+
+// ── Init listeners ────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+
+  // Cerrar modales
+  var xMat = document.getElementById('xmaterias');
+  var xSel = document.getElementById('x-sel-carrera-cfg');
+  var btnC = document.getElementById('mc-cancel');
+  var btnG = document.getElementById('mc-guardar');
+  var btnA = document.getElementById('mc-btn-add-materia');
+  if(xMat) xMat.addEventListener('click', function(){ document.getElementById('modal-materias-carrera').close(); });
+  if(xSel) xSel.addEventListener('click', function(){ document.getElementById('modal-sel-carrera-config').close(); });
+  if(btnC) btnC.addEventListener('click', function(){ document.getElementById('modal-materias-carrera').close(); });
+  if(btnG) btnG.addEventListener('click', mcGuardar);
+
+  // Tabs de año
+  document.getElementById('mc-anio-tabs').addEventListener('click', function(e){
+    var tab = e.target.closest('.mc-anio-tab');
+    if(!tab) return;
+    _mcAnioEdit = tab.dataset.mcAnio;
+    document.querySelectorAll('.mc-anio-tab').forEach(function(t){
+      t.classList.toggle('activo', t.dataset.mcAnio === _mcAnioEdit);
+    });
+    // Inicializar estructura si no existe
+    if(!_materiasCarrera[_mcCarreraEdit]) _materiasCarrera[_mcCarreraEdit] = {};
+    if(!_materiasCarrera[_mcCarreraEdit][_mcAnioEdit]) _materiasCarrera[_mcCarreraEdit][_mcAnioEdit] = [];
+    mcRenderEditor();
+  });
+
+  // Agregar materia
+  if(btnA) btnA.addEventListener('click', function(){
+    if(!_mcCarreraEdit) return;
+    if(!_materiasCarrera[_mcCarreraEdit]) _materiasCarrera[_mcCarreraEdit] = {};
+    if(!_materiasCarrera[_mcCarreraEdit][_mcAnioEdit]) _materiasCarrera[_mcCarreraEdit][_mcAnioEdit] = [];
+    _materiasCarrera[_mcCarreraEdit][_mcAnioEdit].push({ id: mcGenId(), nombre:'', horario:{} });
+    mcRenderEditor();
+    // Focus en el input nuevo
+    setTimeout(function(){
+      var inputs = document.querySelectorAll('.mc-materia-nombre');
+      if(inputs.length) inputs[inputs.length-1].focus();
+    }, 50);
+  });
+
+  // Cargar materias al iniciar
+  setTimeout(mcCargarMaterias, 600);
+});
+</script>
+
+
+<!-- ══════════════════════════════════════════════════════
+     SELECTOR DE MATERIAS EN FICHA DE ESTUDIANTE
+     Aparece en el modal al seleccionar carrera + año
+     ══════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    // Insertar panel de materias en el modal de estudiante
+    var mdeHorarioEst = document.getElementById('mde-horario-est');
+    if(mdeHorarioEst){
+      var wrap = mdeHorarioEst.closest('.field');
+      // Panel de materias a continuación del campo de horario
+      var panel = document.createElement('div');
+      panel.id = 'mde-materias-panel';
+      panel.style.display = 'none';
+      panel.innerHTML = '<div class="mde-mat-titulo">Materias que cursa</div>'
+        +'<div id="mde-mat-lista"></div>';
+      wrap.insertAdjacentElement('afterend', panel);
+    }
+
+    // Detectar cambio de carrera o año → renderizar selector de materias
+    var selArea = document.getElementById('mde-area');
+    var selAnio = document.getElementById('mde-car');
+
+    // Filtrar opciones de año según la carrera
+    function actualizarOpcionesAnio(){
+      var carreraId = selArea ? selArea.value : '';
+      var carrera = CARRERAS.find(function(c){ return c.id === carreraId; });
+      var maxAnios = carrera ? (carrera.anios || 3) : 5;
+      var ORDINAL = ['','1° Año','2° Año','3° Año','4° Año','5° Año'];
+      if(!selAnio) return;
+      var valorActual = selAnio.value;
+      // Mostrar/ocultar opciones
+      Array.from(selAnio.options).forEach(function(opt){
+        if(!opt.value) return; // placeholder
+        var num = parseInt(opt.value.match(/(\d)/));
+        opt.style.display = num <= maxAnios ? '' : 'none';
+      });
+      // Si el año actual ya no es válido, resetear
+      var numActual = valorActual ? parseInt(valorActual.match(/(\d)/)) : 0;
+      if(numActual > maxAnios) selAnio.value = '';
+    }
+
+    function onCarreraAnioChange(){
+      var carreraId = selArea ? selArea.value : '';
+      var anioVal   = selAnio ? selAnio.value : '';
+      var anioNum   = anioVal.match(/(\d)/);
+      var anio      = anioNum ? anioNum[1] : '';
+      mdeRenderMaterias(carreraId, anio);
+    }
+
+    if(selArea) selArea.addEventListener('change', function(){
+      actualizarOpcionesAnio();
+      onCarreraAnioChange();
+    });
+    if(selAnio) selAnio.addEventListener('change', onCarreraAnioChange);
+  });
+
+  // ── Renderizar lista de materias en ficha ─────────
+  function mdeRenderMaterias(carreraId, anio, estadoPrevio){
+    var panel = document.getElementById('mde-materias-panel');
+    var lista = document.getElementById('mde-mat-lista');
+    if(!panel || !lista) return;
+
+    if(!carreraId || !anio){
+      panel.style.display = 'none';
+      return;
+    }
+
+    var mats = mcGetMaterias(carreraId, anio);
+    if(!mats || !mats.length){
+      panel.style.display = 'none';
+      return;
+    }
+
+    panel.style.display = '';
+    var prev = estadoPrevio || {};
+
+    lista.innerHTML = '';
+    mats.forEach(function(mat){
+      var estado = prev[mat.id] || 'cursa'; // default: cursa
+      var resumen = mcResumenHorario(mat.horario);
+
+      var item = document.createElement('div');
+      item.className = 'mde-mat-item';
+      item.innerHTML = '<span class="mde-mat-nombre">'+mcEsc(mat.nombre||'Materia')+'</span>'
+        +(resumen ? '<span class="mde-mat-horario-txt">'+mcEsc(resumen)+'</span>' : '')
+        +'<div class="mde-mat-opciones">'
+          +'<button class="mde-mat-opt'+(estado==='cursa'  ?' sel-cursa' :'') +'" data-mat-id="'+mat.id+'" data-opt="cursa"   title="Cursa presencialmente">Cursa</button>'
+          +'<button class="mde-mat-opt'+(estado==='virtual'?' sel-virtual':'') +'" data-mat-id="'+mat.id+'" data-opt="virtual"  title="Cursa de forma virtual">Virtual</button>'
+          +'<button class="mde-mat-opt'+(estado==='equiv'  ?' sel-equiv'  :'') +'" data-mat-id="'+mat.id+'" data-opt="equiv"    title="Tiene equivalencia aprobada">Equiv.</button>'
+          +'<button class="mde-mat-opt'+(estado==='no'     ?' sel-no'     :'') +'" data-mat-id="'+mat.id+'" data-opt="no"       title="No cursa">No cursa</button>'
+        +'</div>';
+      lista.appendChild(item);
+    });
+
+    // Eventos de selección
+    lista.querySelectorAll('.mde-mat-opt').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var matId = this.dataset.matId;
+        var opt   = this.dataset.opt;
+        // Deseleccionar los otros del mismo matId
+        lista.querySelectorAll('.mde-mat-opt[data-mat-id="'+matId+'"]').forEach(function(b){
+          b.className = 'mde-mat-opt';
+        });
+        this.className = 'mde-mat-opt sel-'+opt;
+        mdeActualizarHiddenMaterias();
+      });
+    });
+
+    mdeActualizarHiddenMaterias();
+  }
+
+  // ── Serializar selecciones en el campo hidden ──────
+  function mdeActualizarHiddenMaterias(){
+    var lista = document.getElementById('mde-mat-lista');
+    var hiddenMat = document.getElementById('mde-materias');
+    if(!lista || !hiddenMat) return;
+    var estado = {};
+    lista.querySelectorAll('.mde-mat-opt[class*="sel-"]').forEach(function(btn){
+      var opt = btn.dataset.opt;
+      // Verificar que tenga la clase de selección activa
+      var clases = ['sel-cursa','sel-virtual','sel-equiv','sel-no'];
+      var activa = clases.some(function(c){ return btn.classList.contains(c); });
+      if(activa) estado[btn.dataset.matId] = opt;
+    });
+    hiddenMat.value = JSON.stringify(estado);
+  }
+
+  // Exponer función para que abrirDocente pueda llamarla
+  window.mdeRenderMaterias = mdeRenderMaterias;
+})();
+</script>
+
+
+<!-- ══════════════════════════════════════════════════════
+     Parche: al guardar estudiante, incluir materiasestado
+     Intercepta supaFetch para inyectar el campo en el payload
+     ══════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  // Esperar a que supaFetch esté definido (app.js carga antes)
+  function patchSupaFetch(){
+    if(typeof supaFetch === 'undefined'){ setTimeout(patchSupaFetch, 100); return; }
+    var _origSupaFetch = supaFetch;
+    window.supaFetch = function(method, table, params, body){
+      // Si es un POST/PATCH a docentes y hay materiasestado pendiente, inyectarlo
+      if((method === 'POST' || method === 'PATCH') && table === 'docentes' && window._pendingMateriasEstado !== undefined){
+        if(body && typeof body === 'object'){
+          body = Object.assign({}, body, { materiasestado: window._pendingMateriasEstado });
+        }
+        window._pendingMateriasEstado = undefined;
+      }
+      return _origSupaFetch(method, table, params, body);
+    };
+  }
+
+  // Capturar materiasestado antes del click de guardar (capture phase)
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.id === 'savedoc'){
+      var hiddenMat = document.getElementById('mde-materias');
+      if(hiddenMat && hiddenMat.value){
+        try { window._pendingMateriasEstado = JSON.parse(hiddenMat.value); }
+        catch(e){ window._pendingMateriasEstado = {}; }
+      } else {
+        window._pendingMateriasEstado = {};
+      }
+    }
+  }, true); // capture: true → antes del listener de app.js
+
+  // También para el botón "Guardar igual" del modal de duplicado
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.id === 'dup-igual'){
+      var hiddenMat = document.getElementById('mde-materias');
+      if(hiddenMat && hiddenMat.value){
+        try { window._pendingMateriasEstado = JSON.parse(hiddenMat.value); }
+        catch(e){ window._pendingMateriasEstado = {}; }
+      }
+    }
+  }, true);
+
+  patchSupaFetch();
+})();
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  Al abrir modal de estudiante: cargar materiasestado previo
+//  y disparar el render de materias con el estado guardado
+// ══════════════════════════════════════════════════════
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      // Encadenar sobre el abrirDocente ya parchado en el bloque anterior
+      var _prevAbrirDocente = window.abrirDocente;
+      window.abrirDocente = function(doc){
+        if(_prevAbrirDocente) _prevAbrirDocente(doc);
+        // Renderizar materias con estado previo después de que app.js llene los selects
+        setTimeout(function(){
+          var selArea = document.getElementById('mde-area');
+          var selAnio = document.getElementById('mde-car');
+          var carreraId = selArea ? selArea.value : '';
+          var anioVal   = selAnio ? selAnio.value : '';
+          var anioNum   = anioVal.match(/(\d)/);
+          var anio      = anioNum ? anioNum[1] : '';
+          var estadoPrevio = doc ? (doc.materiasestado || {}) : {};
+          if(typeof actualizarOpcionesAnio === 'function') actualizarOpcionesAnio();
+          if(typeof mdeRenderMaterias === 'function'){
+            mdeRenderMaterias(carreraId, anio, estadoPrevio);
+          }
+        }, 150);
+      };
+    }, 400);
+  });
+})();
+</script>
+</body>

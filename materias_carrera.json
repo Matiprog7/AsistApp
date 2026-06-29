@@ -1,0 +1,2455 @@
+{
+  "enfermeria": {
+    "1": [
+      {
+        "id": "m_enf1_1",
+        "nombre": "Inglés",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:45",
+            "salida": "19:25"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "21:35",
+            "salida": "22:15"
+          }
+        }
+      },
+      {
+        "id": "m_enf1_2",
+        "nombre": "Morfofisiología Humana",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "20:10",
+            "salida": "21:35"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "22:15",
+            "salida": "23:35"
+          }
+        }
+      },
+      {
+        "id": "m_enf1_3",
+        "nombre": "Práctica Profesionalizante",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:25",
+            "salida": "21:30"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "20:10",
+            "salida": "21:35"
+          }
+        }
+      },
+      {
+        "id": "m_enf1_4",
+        "nombre": "Cuidados de Enfermería en la Familia y la Comunidad",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:35",
+            "salida": "22:55"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "19:25",
+            "salida": "21:35"
+          }
+        }
+      },
+      {
+        "id": "m_enf1_5",
+        "nombre": "Gestión y Políticas en Salud",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:30",
+            "salida": "23:35"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "22:55",
+            "salida": "23:35"
+          }
+        }
+      },
+      {
+        "id": "m_enf1_6",
+        "nombre": "Comunicación en Salud",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:25",
+            "salida": "21:35"
+          }
+        }
+      }
+    ]
+  },
+  "prof_inicial": {
+    "1": [
+      {
+        "id": "m_ini1_1",
+        "nombre": "Problemática Socioantropológica en la Educación",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_2",
+        "nombre": "Inglés",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "19:55"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_3",
+        "nombre": "Lenguaje Audiovisual",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_4",
+        "nombre": "Argentina en el Mundo Contemporáneo",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_5",
+        "nombre": "Lenguaje Corporal",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_6",
+        "nombre": "Práctica I",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_7",
+        "nombre": "Pedagogía",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_8",
+        "nombre": "Psicología y Educación",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_9",
+        "nombre": "Jardín Maternal",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_10",
+        "nombre": "Música",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini1_11",
+        "nombre": "Oralidad, Lectura y Escritura",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      }
+    ],
+    "2": [
+      {
+        "id": "m_ini2_1",
+        "nombre": "Didáctica General",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_2",
+        "nombre": "Práctica II",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_3",
+        "nombre": "Lenguaje Artístico",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_4",
+        "nombre": "Desarrollo del Pensamiento Matemático I",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_5",
+        "nombre": "Lengua y su Didáctica",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_6",
+        "nombre": "Filosofía y Educación",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_7",
+        "nombre": "Sujeto de la Educación y Conv. Escolar",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_8",
+        "nombre": "TIC y la Enseñanza",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_9",
+        "nombre": "Construcción Material",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_10",
+        "nombre": "Cs. Naturales y su Didáctica",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini2_11",
+        "nombre": "Seminario I",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:40"
+          }
+        }
+      }
+    ],
+    "3": [
+      {
+        "id": "m_ini3_1",
+        "nombre": "Matemática y su Didáctica",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_ini3_2",
+        "nombre": "Literatura en el Nivel Inicial",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini3_3",
+        "nombre": "Educación Física",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_ini3_4",
+        "nombre": "Historia y Política de la Educación Argentina",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_ini3_5",
+        "nombre": "Práctica III",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini3_6",
+        "nombre": "Cs. Naturales - Educación para la Salud",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_ini3_7",
+        "nombre": "Ciencias Sociales y su Didáctica",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_ini3_8",
+        "nombre": "Seminario III",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "22:40"
+          }
+        }
+      }
+    ],
+    "4": [
+      {
+        "id": "m_ini4_1",
+        "nombre": "Práctica IV",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_ini4_2",
+        "nombre": "Ética",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:00"
+          }
+        }
+      },
+      {
+        "id": "m_ini4_3",
+        "nombre": "Educación Artística - Teatro",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_ini4_4",
+        "nombre": "Trabajo de Campo",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_ini4_5",
+        "nombre": "Educación Sexual Integral",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_ini4_6",
+        "nombre": "Ateneos",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_ini4_7",
+        "nombre": "Problemáticas y Desafíos del Nivel y Jardín Maternal",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      }
+    ]
+  },
+  "prof_primaria": {
+    "1": [
+      {
+        "id": "m_pri1_1",
+        "nombre": "Práctica I",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_2",
+        "nombre": "Inglés",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "19:10"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_3",
+        "nombre": "Lenguaje Audiovisual",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_4",
+        "nombre": "Oralidad, Lectura y Escritura",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_5",
+        "nombre": "Lenguaje Corporal",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_6",
+        "nombre": "Argentina en el Mundo Contemporáneo",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_7",
+        "nombre": "Pedagogía",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_8",
+        "nombre": "Psicología y Educación",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_9",
+        "nombre": "Desarrollo del Pensamiento Matemático",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_pri1_10",
+        "nombre": "Problemática Soc. en la Educación",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      }
+    ],
+    "2": [
+      {
+        "id": "m_pri2_1",
+        "nombre": "Didáctica General",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_2",
+        "nombre": "Sujeto de la Educación y Convivencia Escolar",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_3",
+        "nombre": "Lenguaje Artístico",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_4",
+        "nombre": "Lengua y su Didáctica",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:40"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_5",
+        "nombre": "Matemática y su Didáctica",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_6",
+        "nombre": "Práctica II",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_7",
+        "nombre": "Ciencias Sociales y su Didáctica",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_8",
+        "nombre": "Filosofía",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_9",
+        "nombre": "Inglés",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_pri2_10",
+        "nombre": "Ciencias Naturales y su Didáctica I",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      }
+    ],
+    "4": [
+      {
+        "id": "m_pri4_1",
+        "nombre": "Trabajo de Campo",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri4_2",
+        "nombre": "Práctica IV",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_pri4_3",
+        "nombre": "Inglés",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_pri4_4",
+        "nombre": "Educación Sexual Integral",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_pri4_5",
+        "nombre": "Ateneos",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_pri4_6",
+        "nombre": "Práctica IV (Jueves)",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_pri4_7",
+        "nombre": "Ética",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_pri4_8",
+        "nombre": "Problemáticas y Desafíos del Nivel",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      }
+    ]
+  },
+  "admin": {
+    "1": [
+      {
+        "id": "m_adm1_1",
+        "nombre": "Matemática Aplicada",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "21:00"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "18:00",
+            "salida": "19:00"
+          }
+        }
+      },
+      {
+        "id": "m_adm1_2",
+        "nombre": "TIC I",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "22:00"
+          }
+        }
+      },
+      {
+        "id": "m_adm1_3",
+        "nombre": "Gestión Empresarial",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:00"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "23:00"
+          }
+        }
+      },
+      {
+        "id": "m_adm1_4",
+        "nombre": "Sociología Organizacional",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "22:00"
+          }
+        }
+      },
+      {
+        "id": "m_adm1_5",
+        "nombre": "Gestión Contable y Sistemas I",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "23:00"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "22:00"
+          }
+        }
+      }
+    ],
+    "2": [
+      {
+        "id": "m_la2_1",
+        "nombre": "Sistemas de Información Contable II",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la2_2",
+        "nombre": "Gestión Estratégica de Empresas",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la2_3",
+        "nombre": "Régimen Tributario",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la2_4",
+        "nombre": "Inglés",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la2_5",
+        "nombre": "Sistemas Administrativos",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      }
+    ],
+    "3": [
+      {
+        "id": "m_la3_1",
+        "nombre": "Derecho Laboral y Seguridad",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la3_2",
+        "nombre": "Marketing y Ecommerce",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_3",
+        "nombre": "Práctica Profesionalizante",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "22:40",
+            "salida": "23:25"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "22:40",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_4",
+        "nombre": "Administración Financiera",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la3_5",
+        "nombre": "Laboral y Seguridad",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_6",
+        "nombre": "Marketing Digital y Ecommerce",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_7",
+        "nombre": "Práctica Profesionalizante (Jueves)",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_8",
+        "nombre": "Innovación, Digitalización y Ambiente",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      }
+    ]
+  },
+  "marketing": {
+    "2": [
+      {
+        "id": "m_mkt2_1",
+        "nombre": "Práctica Profesionalizante I",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_mkt2_2",
+        "nombre": "Desarrollo Emprendedor",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_mkt2_3",
+        "nombre": "Práctica Profesionalizante I (Lunes 2)",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_mkt2_4",
+        "nombre": "Administración de las Comunidades Digitales",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_mkt2_5",
+        "nombre": "Posicionamiento en Buscadores",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:20"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_mkt2_6",
+        "nombre": "Sitios Web y Publicidad Online",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "22:00"
+          }
+        }
+      },
+      {
+        "id": "m_mkt2_7",
+        "nombre": "Marketing en Móviles",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_mkt2_8",
+        "nombre": "Marketing II",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "23:20"
+          }
+        }
+      }
+    ],
+    "3": [
+      {
+        "id": "m_mkt3_1",
+        "nombre": "Administración Estratégica",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_mkt3_2",
+        "nombre": "Práctica Profesionalizante II",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "22:40",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_mkt3_3",
+        "nombre": "Estrategias de Ventas en Medios Digitales",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_mkt3_4",
+        "nombre": "Analítica Web",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "22:00"
+          }
+        }
+      },
+      {
+        "id": "m_mkt3_5",
+        "nombre": "Plan de Marketing",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      }
+    ]
+  },
+  "agropecuaria": {
+    "2": [
+      {
+        "id": "m_agr2_1",
+        "nombre": "Práctica Profesionalizante",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:40"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_agr2_2",
+        "nombre": "Agricultura de Precisión",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_agr2_3",
+        "nombre": "Transmisiones No Mecánicas",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_agr2_4",
+        "nombre": "Seguridad e Higiene y Medio Ambiente",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_agr2_5",
+        "nombre": "Portugués",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_agr2_6",
+        "nombre": "Maquinarias Agropecuarias I",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "23:20"
+          }
+        }
+      }
+    ],
+    "3": [
+      {
+        "id": "m_agr3_1",
+        "nombre": "Maquinarias Agropecuarias II",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "20:20"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "20:30",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_agr3_2",
+        "nombre": "Gestión Integral",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:10",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_agr3_3",
+        "nombre": "Práctica Profesionalizante II",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "20:30",
+            "salida": "23:20"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "21:40"
+          }
+        }
+      },
+      {
+        "id": "m_agr3_4",
+        "nombre": "Instalaciones Especiales",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:20"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_agr3_5",
+        "nombre": "Vehículos Especiales y Maquinarias Auxiliares",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "22:00"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "21:40",
+            "salida": "23:20"
+          }
+        }
+      }
+    ]
+  },
+  "fullstack": {
+    "1": [
+      {
+        "id": "m_fs1_1",
+        "nombre": "Alfabetización Digital",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "21:30"
+          }
+        }
+      },
+      {
+        "id": "m_fs1_2",
+        "nombre": "Base de Datos I",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:30",
+            "salida": "23:30"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "21:30"
+          }
+        }
+      },
+      {
+        "id": "m_fs1_3",
+        "nombre": "Introducción al Análisis de Sistemas",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "21:00"
+          }
+        }
+      },
+      {
+        "id": "m_fs1_4",
+        "nombre": "Algoritmos I",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "23:00"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "22:30"
+          }
+        }
+      },
+      {
+        "id": "m_fs1_5",
+        "nombre": "Emprendedurismo",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "21:30"
+          }
+        }
+      }
+    ]
+  },
+  "mkt_negocios": {
+    "1": [
+      {
+        "id": "m_mn1_1",
+        "nombre": "Inglés Técnico I",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "21:00"
+          }
+        }
+      },
+      {
+        "id": "m_mn1_2",
+        "nombre": "Investigación de Mercado",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "23:00"
+          }
+        }
+      },
+      {
+        "id": "m_mn1_3",
+        "nombre": "Tecnología Digital I",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "21:30"
+          }
+        }
+      },
+      {
+        "id": "m_mn1_4",
+        "nombre": "Sociología y Cultura Digital",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:30",
+            "salida": "23:00"
+          }
+        }
+      },
+      {
+        "id": "m_mn1_5",
+        "nombre": "Gestión Empresarial",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "23:00"
+          }
+        }
+      },
+      {
+        "id": "m_mn1_6",
+        "nombre": "Marketing I",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "23:00"
+          }
+        }
+      },
+      {
+        "id": "m_mn1_7",
+        "nombre": "Plan de Marketing",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "23:00"
+          }
+        }
+      }
+    ]
+  },
+  "prof_quimica": {
+    "4": [
+      {
+        "id": "m_qui4_1",
+        "nombre": "Inv. y Laboratorio de la Química",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_2",
+        "nombre": "Práctica IV",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_3",
+        "nombre": "Historia y Epistemología de la Química",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_4",
+        "nombre": "Did. de las Ciencias Naturales III",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_5",
+        "nombre": "Química en el Mundo Actual",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_6",
+        "nombre": "Ética y Const. de Ciudadanía",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_7",
+        "nombre": "Desarrollo Humano, Amb. y Salud",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_8",
+        "nombre": "Química de los Proc. Industriales",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "21:20"
+          }
+        }
+      },
+      {
+        "id": "m_qui4_9",
+        "nombre": "Problemas y Desafíos del Nivel",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      }
+    ]
+  },
+  "prof_biologia": {
+    "2": [
+      {
+        "id": "m_bio2_1",
+        "nombre": "Trabajo Experimental en Biología",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_2",
+        "nombre": "Biología de las Plantas I",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_3",
+        "nombre": "Didáctica General",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_4",
+        "nombre": "Química Orgánica y Biológica",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_5",
+        "nombre": "Filosofía de las Ciencias",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_6",
+        "nombre": "Psicología y Educación",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_7",
+        "nombre": "Biología de los Microorganismos y Hongos",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_8",
+        "nombre": "Práctica II",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio2_9",
+        "nombre": "Biología Animal I",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "23:20"
+          }
+        }
+      }
+    ],
+    "3": [
+      {
+        "id": "m_bio3_1",
+        "nombre": "Biología Humana",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_2",
+        "nombre": "Biología Animal II",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_3",
+        "nombre": "Biología de las Plantas II",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_4",
+        "nombre": "Historia y Política de la Ed. Argentina",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_5",
+        "nombre": "Hist. y Epist. de la Biología",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_6",
+        "nombre": "Suj. de la Educación y ESI",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:35"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_7",
+        "nombre": "Did. de las Ciencias Naturales",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_8",
+        "nombre": "Práctica Profesionalizante III",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_bio3_9",
+        "nombre": "Ecología",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      }
+    ]
+  },
+  "prof_exactas": {
+    "1": [
+      {
+        "id": "m_exa1_1",
+        "nombre": "Práctica Prof. Docente I",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "22:00"
+          }
+        }
+      },
+      {
+        "id": "m_exa1_2",
+        "nombre": "Estadísticas y Probabilidad",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:00"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "20:30",
+            "salida": "23:30"
+          }
+        }
+      },
+      {
+        "id": "m_exa1_3",
+        "nombre": "Inmersión de los Fenómenos de la Naturaleza",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "18:30",
+            "salida": "20:30"
+          }
+        }
+      },
+      {
+        "id": "m_exa1_4",
+        "nombre": "Soc. Trans Cultural e Instituciones",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "20:30",
+            "salida": "23:30"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "17:30",
+            "salida": "20:30"
+          }
+        }
+      },
+      {
+        "id": "m_exa1_5",
+        "nombre": "Fenómenos de la Naturaleza",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "22:30"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "22:30"
+          }
+        }
+      }
+    ]
+  },
+  "lic_admin": {
+    "1": [
+      {
+        "id": "m_la1_1",
+        "nombre": "Matemática Aplicada",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "21:00"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "18:00",
+            "salida": "19:00"
+          }
+        }
+      },
+      {
+        "id": "m_la1_2",
+        "nombre": "TIC I",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "22:00"
+          }
+        }
+      },
+      {
+        "id": "m_la1_3",
+        "nombre": "Gestión Empresarial",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "22:00",
+            "salida": "23:00"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "23:00"
+          }
+        }
+      },
+      {
+        "id": "m_la1_4",
+        "nombre": "Sociología Organizacional",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "21:00"
+          }
+        }
+      },
+      {
+        "id": "m_la1_5",
+        "nombre": "Gestión Contable y Sistemas I",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "21:00",
+            "salida": "23:00"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "19:00",
+            "salida": "22:00"
+          }
+        }
+      }
+    ],
+    "2": [
+      {
+        "id": "m_la2_1",
+        "nombre": "Sistemas de Información Contable II",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la2_2",
+        "nombre": "Gestión Estratégica de Empresas",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          },
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la2_3",
+        "nombre": "Régimen Tributario",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          },
+          "jueves": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la2_4",
+        "nombre": "Inglés",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la2_5",
+        "nombre": "Sistemas Administrativos",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      }
+    ],
+    "3": [
+      {
+        "id": "m_la3_1",
+        "nombre": "Derecho Laboral y Seguridad",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la3_2",
+        "nombre": "Marketing y Ecommerce",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_3",
+        "nombre": "Práctica Profesionalizante",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "22:40",
+            "salida": "23:25"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "22:40",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_4",
+        "nombre": "Administración Financiera",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_la3_5",
+        "nombre": "Laboral y Seguridad",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_6",
+        "nombre": "Marketing Digital y Ecommerce",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_7",
+        "nombre": "Práctica Profesionalizante (Jueves)",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "23:25"
+          }
+        }
+      },
+      {
+        "id": "m_la3_8",
+        "nombre": "Innovación, Digitalización y Ambiente",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:25"
+          }
+        }
+      }
+    ]
+  },
+  "lic_higiene": {
+    "1": [
+      {
+        "id": "m_lh1_1",
+        "nombre": "Física",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "22:30"
+          }
+        }
+      },
+      {
+        "id": "m_lh1_2",
+        "nombre": "Introducción a Higiene y Seguridad",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "22:30"
+          }
+        }
+      },
+      {
+        "id": "m_lh1_3",
+        "nombre": "Química",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "22:30"
+          }
+        }
+      },
+      {
+        "id": "m_lh1_4",
+        "nombre": "Análisis Matemático",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "22:30"
+          }
+        }
+      },
+      {
+        "id": "m_lh1_5",
+        "nombre": "Tecnología de los Materiales, Herramientas y Equipos",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:30",
+            "salida": "22:00"
+          }
+        }
+      }
+    ]
+  },
+  "software": {
+    "2": [
+      {
+        "id": "m_sw2_1",
+        "nombre": "Práctica Profesionalizante I",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "17:50",
+            "salida": "20:35"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_sw2_2",
+        "nombre": "Programación II",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          },
+          "martes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_sw2_3",
+        "nombre": "Modelado y Arquitectura de Software",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_sw2_4",
+        "nombre": "Sistemas Operativos",
+        "horario": {
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_sw2_5",
+        "nombre": "Inglés",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_sw2_6",
+        "nombre": "Estadística y Probabilidad",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      }
+    ],
+    "3": [
+      {
+        "id": "m_sw3_1",
+        "nombre": "Ingeniería de Software",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "22:40"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          }
+        }
+      },
+      {
+        "id": "m_sw3_2",
+        "nombre": "Programación III",
+        "horario": {
+          "lunes": {
+            "activo": true,
+            "entrada": "21:20",
+            "salida": "23:20"
+          },
+          "miercoles": {
+            "activo": true,
+            "entrada": "19:10",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_sw3_3",
+        "nombre": "Interfaz de Usuario",
+        "horario": {
+          "martes": {
+            "activo": true,
+            "entrada": "19:55",
+            "salida": "21:15"
+          }
+        }
+      },
+      {
+        "id": "m_sw3_4",
+        "nombre": "Gestión de Proyectos",
+        "horario": {
+          "jueves": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "22:40"
+          }
+        }
+      },
+      {
+        "id": "m_sw3_5",
+        "nombre": "Práctica Profesionalizante III",
+        "horario": {
+          "viernes": {
+            "activo": true,
+            "entrada": "20:35",
+            "salida": "23:20"
+          }
+        }
+      }
+    ]
+  }
+}

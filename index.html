@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>asistApp — Profesores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- PANTALLA LICENCIA BLOQUEADA -->
+<div id="licencia-screen" style="display:none">
+  <div class="licencia-card">
+    <div class="licencia-icon">🔒</div>
+    <h2>Sistema suspendido</h2>
+    <p id="licencia-msg">El acceso a este sistema ha sido suspendido. Por favor contactá al administrador.</p>
+    <div class="licencia-contact" id="licencia-contact"></div>
+    <button id="btn-logout-lic" class="btn-sec" style="margin-top:1.5rem">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- PANTALLA LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <h1>asist<span>App</span></h1>
+      <p>UPC — Sede Las Varillas</p>
+    </div>
+    <div class="login-btns">
+      <button id="btn-login-google" class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Ingresar con Google
+      </button>
+      
+    </div>
+  </div>
+</div>
+
+<!-- BARRA DE USUARIO (visible cuando está logueado) -->
+<div id="user-bar" style="display:none">
+  <img id="user-avatar" src="" alt=""/>
+  <span id="user-name"></span>
+  <span id="user-role"></span>
+  <button id="btn-dark" title="Modo oscuro"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+  <button id="btn-logout">Salir</button>
+</div>
+
+<header>
+  <div>
+    <h1>asist<span>App</span></h1>
+    <p id="fecha-hoy"></p>
+    <nav class="nivel-nav">
+      <a href="index.html" class="nivel-nav-btn activo"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Profesores</a>
+      <a href="estudiantes.html" class="nivel-nav-btn" target="_blank" rel="noopener"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Estudiantes</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-top:.3rem">
+      <select id="selector-anio" class="anio-sel"><option value="2026">2026 (actual)</option></select>
+    </div>
+    <div class="fecha-nav">
+      <button id="btn-fecha-ant">‹</button>
+      <input type="date" id="input-fecha-hdr"/>
+      <button id="btn-fecha-sig">›</button>
+      <button id="btn-fecha-hoy-hdr" class="btn-hdr-hoy">Hoy</button>
+    </div>
+  </div>
+  <div class="summary">
+    <div class="pct-turnos-wrap">
+      <div class="si big pct-turno-total" title="Asistencia total hoy">
+        <span class="v" id="pct-hoy">—</span>
+        <span class="l">% Hoy</span>
+      </div>
+      <div class="pct-turnos-detalle">
+        <div class="pct-turno-item si-btn" data-filtro="turno-maniana" title="Turno mañana (7–13 hs) — click para filtrar">
+          <span class="pct-turno-emoji" style="font-size:.65rem;font-weight:800;color:rgba(255,255,255,.9)">☀ Mañana</span>
+          <span class="v pct-turno-v" id="pct-maniana">—</span>
+        </div>
+        <div class="pct-turno-item si-btn" data-filtro="turno-tarde" title="Turno tarde (13–19 hs) — click para filtrar">
+          <span class="pct-turno-emoji" style="font-size:.65rem;font-weight:800;color:rgba(255,255,255,.9)">☾ Tarde</span>
+          <span class="v pct-turno-v" id="pct-tarde">—</span>
+        </div>
+
+      </div>
+    </div>
+    <div class="si-sep"></div>
+    <div class="si si-btn" data-filtro="presente"      title="Presentes"><span class="v" id="cnt-p"   style="color:#6EE7B7">0</span><span class="l">Pres.</span></div>
+    <div class="si si-btn" data-filtro="justificada"   title="Inasist. Justificada"><span class="v" id="cnt-j"   style="color:#FDE047">0</span><span class="l">Just.</span></div>
+    <div class="si si-btn" data-filtro="injustificada" title="Inasist. Injustificada"><span class="v" id="cnt-i"   style="color:#FCA5A5">0</span><span class="l">Injust.</span></div>
+    <div class="si si-btn" data-filtro="parcial"       title="Falta Parcial"><span class="v" id="cnt-fp"  style="color:#D97706">0</span><span class="l">Parcial</span></div>
+    <div class="si-sep"></div>
+    <div class="si si-btn" data-filtro="medica"          title="Carpeta Médica"><span class="v" id="cnt-m"   style="color:#93C5FD">0</span><span class="l">C.Méd.</span></div>
+    <div class="si si-btn" data-filtro="medica_familiar" title="C. Méd. Familiar"><span class="v" id="cnt-mf"  style="color:#67E8F9">0</span><span class="l">C.M.F.</span></div>
+    <div class="si si-btn" data-filtro="cambio"          title="Cambio Actividad"><span class="v" id="cnt-c"   style="color:#FB923C">0</span><span class="l">Cambio</span></div>
+    <div class="si si-btn" data-filtro="duelo"           title="Duelo"><span class="v" id="cnt-d"   style="color:#9CA3AF">0</span><span class="l">Duelo</span></div>
+    <div class="si si-btn" data-filtro="lic_embarazo"    title="Lic. Embarazo"><span class="v" id="cnt-le"  style="color:#F9A8D4">0</span><span class="l">Embarazo</span></div>
+    <div class="si si-btn" data-filtro="lic_gremial"     title="Lic. Gremial"><span class="v" id="cnt-lg"  style="color:#C4B5FD">0</span><span class="l">Gremial</span></div>
+    <div class="si si-btn" data-filtro="carpeta_psiq"    title="Carpeta Psiquiátrica"><span class="v" id="cnt-cp"  style="color:#FDE047">0</span><span class="l">Psiq.</span></div>
+    <div class="si si-btn" data-filtro="formacion"       title="Formación"><span class="v" id="cnt-fo"  style="color:#D4B896">0</span><span class="l">Form.</span></div>
+    <div class="si si-btn" data-filtro="paro"            title="Paro"><span class="v" id="cnt-par" style="color:#FCA5A5">0</span><span class="l">Paro</span></div>
+    <div class="si-sep"></div>
+    <div class="si si-btn" data-filtro="" title="Ver todos"><span class="v" id="cnt-tot">0</span><span class="l">Total</span></div>
+  </div>
+  <div class="hdr-actions-wrap">
+    <div class="hdr-dropdown">
+      <button class="btn-hdr btn-hdr-menu" id="btn-acciones-menu"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Acciones ▾</button>
+      <div class="hdr-dropdown-list" id="hdr-dropdown-list">
+        <button class="hdr-dd-item btn-hdr-reporte" id="btn-reporte-grupo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Reporte por grupo</button>
+        <button class="hdr-dd-item btn-hdr-config"  id="btn-config"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config</button>
+        <button class="hdr-dd-item btn-hdr-grupos"  id="btn-grupos"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Grupos</button>
+        <button class="hdr-dd-item btn-hdr-export"  id="btn-export-dia"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar hoy</button>
+        <button class="hdr-dd-item btn-hdr-ranking" id="btn-ranking"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Ranking</button>
+        <button class="hdr-dd-item btn-hdr-masivo"  id="btn-masivo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Registro masivo</button>
+        <button class="hdr-dd-item" id="btn-importar-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Importar archivo</button>
+        <button class="hdr-dd-item" id="btn-eliminar-masivo" style="color:#FCA5A5"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> Eliminar docentes</button>
+        <button class="hdr-dd-item" id="btn-papelera" style="display:none" onclick="abrirPapelera()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> <span style="color:#DC2626">Papelera</span></button>
+        <button class="hdr-dd-item" id="btn-tendencias"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Tendencias</button>
+        <button class="hdr-dd-item" id="btn-jubilados"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M9 14l-2 6"/><path d="M15 14l2 6"/><path d="M7 20h10"/></svg> Jubilados</button>
+      </div>
+    </div>
+    <!-- CAMPANA DE ALERTAS -->
+    <div class="alertas-wrap" id="alertas-wrap">
+      <button class="btn-hdr btn-alertas" id="btn-alertas" title="Alertas de vencimiento" onclick="abrirPanelAlertas()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="alertas-badge" id="alertas-badge" style="display:none">0</span>
+      </button>
+      <div class="panel-alertas" id="panel-alertas">
+        <div class="alertas-hdr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Vencimientos próximos
+        </div>
+        <div class="alertas-lista" id="alertas-lista"></div>
+      </div>
+    </div>
+    <button class="btn-hdr btn-hdr-nuevo" id="btn-nuevo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nuevo docente</button>
+  </div>
+</header>
+
+<main>
+  <!-- TOGGLE DE VISTA -->
+  <div class="vista-toggle" id="vista-toggle">
+    <button class="vista-btn activo" data-vista="cards" onclick="cambiarVista('cards')" title="Vista cards">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Cards
+    </button>
+    <button class="vista-btn" data-vista="semana" onclick="cambiarVista('semana')" title="Vista semana">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Semana
+    </button>
+    <button class="vista-btn" data-vista="mes" onclick="cambiarVista('mes')" title="Vista mes">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="13" y2="18"/></svg>
+      Mes
+    </button>
+  </div>
+  <!-- CONTENEDOR CALENDARIO -->
+  <div id="cal-wrap" style="display:none">
+    <div id="cal-nav" class="cal-nav"></div>
+    <div id="cal-table-zone"></div>
+  </div>
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="buscador-wrap">
+        <span class="buscador-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input type="text" id="buscador" placeholder="Buscar docente…" autocomplete="off"/>
+      </div>
+      <select id="filtro-estado">
+        <option value="">Todos los estados</option>
+        <option value="presente">✅ Presente</option>
+        <option value="justificada">📄 Just. Justificada</option>
+        <option value="injustificada">❌ Injustificada</option>
+        <option value="medica">🏥 Carpeta Médica</option>
+        <option value="medica_familiar">👨‍👩‍👧 C. Méd. Familiar</option>
+        <option value="cambio">🔄 Cambio de Actividad</option>
+        <option value="duelo">🕊️ Duelo</option>
+        <option value="lic_embarazo">🤰 Lic. Embarazo</option>
+        <option value="lic_gremial">✊ Lic. Gremial</option>
+        <option value="carpeta_psiq">🧠 Carpeta Psiquiátrica</option>
+        <option value="formacion">📚 Formación otra institución</option>
+        <option value="adelanto">⏩ Adelanto de Horas</option>
+        <option value="compensada">✅ Falta Compensada</option>
+        <option value="paro">✊ Paro Docente</option>
+        <option value="sin-registro">— Sin registro</option>
+      </select>
+      <select id="filtro-dia">
+        <option value="">Todos los días</option>
+        <option value="hoy">📅 Solo los de hoy</option>
+        <option value="1">Lunes</option>
+        <option value="2">Martes</option>
+        <option value="3">Miércoles</option>
+        <option value="4">Jueves</option>
+        <option value="5">Viernes</option>
+        <option value="6">Sábado</option>
+      </select>
+      <select id="filtro-grupo"><option value="">Todos los grupos</option></select>
+      <select id="filtro-area"><option value="">Todas las áreas</option></select>
+      <button id="filtro-reset" title="Limpiar filtros">✕ Limpiar</button>
+    </div>
+    <span id="filtro-count" class="filtro-count"></span>
+  </div>
+  <div id="grid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</main>
+
+
+
+<!-- MODAL REPORTE GRUPO -->
+<dialog id="modal-reporte-grupo">
+  <div class="dlg-hdr">
+    <div>
+      <h2>Reporte por grupo</h2>
+      <p id="rg-subtit">Seleccioná un grupo y período</p>
+    </div>
+    <button class="btn-x" id="xrg">✕</button>
+  </div>
+  <div class="perf-periodo-bar">
+    <select id="rg-grupo">
+      <option value="">— Seleccioná un grupo —</option>
+    </select>
+    <select id="rg-tipo-periodo">
+      <option value="mes">Por mes</option>
+      <option value="anio">Por año</option>
+      <option value="rango">Rango</option>
+    </select>
+    <div id="rg-ctrl-mes">
+      <select id="rg-mes-mes" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+      <select id="rg-mes-anio" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+      </select>
+      <input type="hidden" id="rg-mes"/>
+    </div>
+    <div id="rg-ctrl-anio" style="display:none">
+      <input type="number" id="rg-anio" min="2020" max="2030" style="width:80px"/>
+    </div>
+    <div id="rg-ctrl-rango" style="display:none">
+      <input type="date" id="rg-desde"/>
+      <span>→</span>
+      <input type="date" id="rg-hasta"/>
+    </div>
+  </div>
+  <div class="perf-export-bar">
+    <span class="perf-export-lbl">Exportar reporte:</span>
+    <button class="btn-export-xlsx" id="rg-export-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+    <button class="btn-export-pdf"  id="rg-export-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+  </div>
+  <div class="dlg-scroll" id="rg-contenido">
+    <div class="perf-empty">Seleccioná un grupo para ver el reporte</div>
+  </div>
+</dialog>
+
+<!-- MODAL CONFIGURACIÓN -->
+<dialog id="modal-config">
+  <div class="dlg-hdr">
+    <div><h2><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Configuración</h2><p>Ciclo lectivo y opciones — año <span id="cfg-anio-lbl"></span></p></div>
+    <button class="btn-x" id="xconfig">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <div class="section-lbl" style="margin-bottom:.75rem"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Ciclo lectivo</div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Inicio del ciclo</label>
+        <input type="date" id="cfg-ciclo-inicio"/>
+      </div>
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Fin del ciclo</label>
+        <input type="date" id="cfg-ciclo-fin"/>
+      </div>
+    </div>
+    <div style="margin-top:.5rem;font-size:.75rem;color:#6B7280">
+      El ciclo lectivo define el período para calcular % de asistencia anual en las fichas de cada docente.
+    </div>
+    <div class="divider" style="margin:1.25rem 0"></div>
+    <div class="section-lbl" style="margin-bottom:.75rem"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Cierre de ciclo lectivo</div>
+    <div style="font-size:.78rem;color:#6B7280;margin-bottom:.75rem">Al cerrar el ciclo, se archivan todas las novedades del año y se limpian para comenzar el nuevo ciclo. Los horarios y datos de los docentes se mantienen.</div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:.5rem">
+      <select id="cfg-ciclo-anio-cerrar" style="font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:.35rem .6rem;font-size:.78rem"></select>
+      <button class="btn-danger" id="cfg-cerrar-ciclo"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Archivar y cerrar ciclo</button>
+    </div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.75rem">
+      <select id="cfg-backup-anio" style="font-family:inherit;border:1.5px solid var(--border);border-radius:8px;padding:.35rem .6rem;font-size:.78rem"></select>
+      <button class="btn-s" id="cfg-backup-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Backup Excel</button>
+      <button class="btn-s" id="cfg-backup-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Backup PDF</button>
+    </div>
+    <div id="cfg-ciclos-archivados"></div>
+    <div class="divider" style="margin:1.25rem 0"></div>
+    <div class="section-lbl" style="margin-bottom:.75rem">🎌 Feriados</div>
+    <div style="font-size:.78rem;color:#6B7280;margin-bottom:.75rem">Agregá los feriados nacionales para excluirlos del cálculo de presentes.</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem">
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <input type="date" id="cfg-feriado-fecha" style="font-family:inherit;flex:1;min-width:120px"/>
+        <span style="font-size:.75rem;color:#6B7280">hasta</span>
+        <input type="date" id="cfg-feriado-hasta" style="font-family:inherit;flex:1;min-width:120px"/>
+        <span style="font-size:.7rem;color:#9CA3AF">(mismo día si es feriado simple)</span>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <input type="text" id="cfg-feriado-nombre" placeholder="Nombre (ej: Receso invernal)" style="font-family:inherit;flex:1;border:1.5px solid var(--border);border-radius:8px;padding:.35rem .6rem;font-size:.78rem"/>
+        <button class="btn-p" id="cfg-feriado-add">Agregar</button>
+      </div>
+    </div>
+    <div id="cfg-feriados-lista"></div>
+  </div>
+  <div class="dlg-footer">
+    <button class="btn-s" id="cfg-cancelar">Cancelar</button>
+    <button class="btn-p" id="cfg-guardar">💾 Guardar</button>
+  </div>
+</dialog>
+
+<!-- MODAL GRUPOS -->
+<dialog id="modal-grupos">
+  <div class="dlg-hdr">
+    <div><h2>Gestión de grupos</h2><p>Crear y administrar grupos</p></div>
+    <button class="btn-x" id="xgrupos">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <div class="grupo-nuevo">
+      <input type="text" id="grupo-nuevo-nombre" placeholder="Nombre del grupo (ej: Turno Mañana)" maxlength="40"/>
+      <input type="color" id="grupo-nuevo-color" value="#2563EB" title="Color del grupo"/>
+      <button class="btn-p" id="grupo-nuevo-btn">Crear</button>
+    </div>
+    <div id="grupos-lista"></div>
+  </div>
+</dialog>
+
+<!-- MODAL EXPORT DÍA -->
+<dialog id="modal-export-dia">
+  <div class="dlg-hdr">
+    <div><h2>Exportar asistencia</h2><p id="export-subtit">Configurá el reporte</p></div>
+    <button class="btn-x" id="xexport">✕</button>
+  </div>
+  <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.9rem;">
+    <div class="field">
+      <label>Tipo de reporte</label>
+      <select id="export-tipo-reporte" style="font-family:inherit">
+        <option value="dia">Por día — todos los docentes ese día</option>
+        <option value="docente">Por docente — historial en un período</option>
+        
+      </select>
+    </div>
+    <div class="field">
+      <label>Filtrar por nivel</label>
+      <select id="export-nivel" style="font-family:inherit">
+        <option value="profesores">👨‍🏫 Profesores</option>
+      </select>
+    </div>
+    <div class="field" id="export-area-field" style="display:none">
+      <label id="export-area-label">Filtrar por área</label>
+      <select id="export-area" style="font-family:inherit">
+        <option value="">Todas las áreas</option>
+      </select>
+    </div>
+    <div id="export-ctrl-dia">
+      <div class="field">
+        <label>Período</label>
+        <select id="export-dia-periodo" style="font-family:inherit">
+          <option value="dia">Un día específico</option>
+          <option value="mes">Por mes</option>
+          <option value="anio">Por año</option>
+          <option value="rango">Rango personalizado</option>
+        </select>
+      </div>
+      <div id="export-dia-ctrl-dia">
+        <div class="field"><label>Fecha</label><input type="date" id="export-fecha" style="font-family:inherit"/></div>
+      </div>
+      <div id="export-dia-ctrl-mes" style="display:none">
+        <div class="field"><label>Mes</label><input type="month" id="export-dia-mes" style="font-family:inherit"/></div>
+      </div>
+      <div id="export-dia-ctrl-anio" style="display:none">
+        <div class="field"><label>Año</label><input type="number" id="export-dia-anio" min="2024" max="2030" style="width:90px;font-family:inherit"/></div>
+      </div>
+      <div id="export-dia-ctrl-rango" style="display:none;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <div class="field"><label>Desde</label><input type="date" id="export-dia-desde" style="font-family:inherit"/></div>
+        <div class="field"><label>Hasta</label><input type="date" id="export-dia-hasta" style="font-family:inherit"/></div>
+      </div>
+    </div>
+    <div id="export-ctrl-docente" style="display:none;flex-direction:column;gap:.7rem;">
+      <div class="field">
+        <label>Docente</label>
+        <select id="export-docente-sel" style="font-family:inherit">
+          <option value="">— Seleccioná un docente —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Período</label>
+        <select id="export-periodo-tipo" style="font-family:inherit">
+          <option value="mes">Por mes</option>
+          <option value="anio">Por año</option>
+          <option value="rango">Rango personalizado</option>
+        </select>
+      </div>
+      <div id="export-ctrl-mes">
+        <input type="month" id="export-mes" style="font-family:inherit"/>
+      </div>
+      <div id="export-ctrl-anio" style="display:none">
+        <input type="number" id="export-anio" min="2020" max="2030" value="2026" style="width:90px;font-family:inherit"/>
+      </div>
+      <div id="export-ctrl-rango" style="display:none;gap:.5rem;align-items:center;">
+        <input type="date" id="export-desde" style="font-family:inherit"/>
+        <span>→</span>
+        <input type="date" id="export-hasta" style="font-family:inherit"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:.75rem;">
+      <button class="btn-export-xlsx" id="export-dia-excel" style="flex:1;padding:.75rem;font-size:.85rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+      <button class="btn-export-pdf"  id="export-dia-pdf"   style="flex:1;padding:.75rem;font-size:.85rem;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL RANKING -->
+<dialog id="modal-ranking">
+  <div class="dlg-hdr">
+    <div>
+      <h2>Ranking de ausentismo</h2>
+      <p id="rank-subtit">Por total de ausencias</p>
+    </div>
+    <button class="btn-x" id="xrank">✕</button>
+  </div>
+  <div class="perf-periodo-bar">
+    <select id="rank-tipo-periodo">
+      <option value="dia">Por día</option>
+      <option value="mes">Por mes</option>
+      <option value="anio">Por año</option>
+      <option value="rango">Rango personalizado</option>
+    </select>
+    <div id="rank-ctrl-dia">
+      <input type="date" id="rank-dia"/>
+    </div>
+    <div id="rank-ctrl-mes" style="display:none">
+      <select id="rank-mes-mes" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+<select id="rank-mes-anio" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)"><option value="2026" selected>2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option><option value="2041">2041</option><option value="2042">2042</option><option value="2043">2043</option><option value="2044">2044</option><option value="2045">2045</option><option value="2046">2046</option><option value="2047">2047</option><option value="2048">2048</option><option value="2049">2049</option><option value="2050">2050</option></select>
+      <input type="hidden" id="rank-mes"/>
+    </div>
+    <div id="rank-ctrl-anio" style="display:none">
+      <input type="number" id="rank-anio" min="2020" max="2030" style="width:80px"/>
+    </div>
+    <div id="rank-ctrl-rango" style="display:none">
+      <input type="date" id="rank-desde"/>
+      <span>→</span>
+      <input type="date" id="rank-hasta"/>
+    </div>
+  </div>
+  <div class="perf-export-bar">
+    <span class="perf-export-lbl">Exportar ranking:</span>
+    <button class="btn-export-xlsx" id="rank-export-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+    <button class="btn-export-pdf"  id="rank-export-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+  </div>
+  <div class="dlg-scroll" id="rank-lista">
+    <div class="perf-loading">Cargando…</div>
+  </div>
+</dialog>
+
+<!-- MODAL REGISTRO MASIVO -->
+<dialog id="modal-masivo">
+  <div class="dlg-hdr">
+    <div>
+      <h2>Registro masivo</h2>
+      <p id="mas-subtit">Seleccioná docentes y elegí el estado</p>
+    </div>
+    <button class="btn-x" id="xmas">✕</button>
+  </div>
+  <div class="mas-fecha-bar">
+    <span class="mas-fecha-lbl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Fecha:</span>
+    <input type="date" id="mas-fecha-input"/>
+    <button id="mas-btn-hoy" class="btn-hoy-mas">Hoy</button>
+  </div>
+  <div class="mas-toolbar">
+    <div class="mas-toolbar-left">
+      <label class="mas-check-all">
+        <input type="checkbox" id="mas-sel-todos"/> Seleccionar todos
+      </label>
+      <span id="mas-count" class="mas-count">0 seleccionados</span>
+    </div>
+    <div class="mas-filtro-wrap">
+      <span class="buscador-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input type="text" id="mas-buscador" placeholder="Buscar…" autocomplete="off"/>
+    </div>
+  </div>
+  <div class="dlg-scroll" id="mas-lista"></div>
+  <div class="mas-footer">
+    <div class="mas-estados" id="mas-estados"></div>
+    <div class="mas-footer-btns">
+      <button class="btn-sec" id="mas-cancelar">Cancelar</button>
+      <button class="btn-p" id="mas-guardar" disabled>Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL PERFIL / HISTORIAL -->
+<dialog id="modal-perfil">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="perf-nom">Docente</h2>
+      <p id="perf-cargo">Cargo</p>
+    </div>
+    <button class="btn-x" id="xperf">✕</button>
+  </div>
+  <div class="perf-periodo-bar">
+    <select id="perf-tipo-periodo">
+      <option value="anio">Por año</option>
+      <option value="mes">Por mes</option>
+      <option value="rango">Rango personalizado</option>
+    </select>
+    <div id="ctrl-anio">
+      <input type="number" id="perf-anio" min="2020" max="2030" value="2025" style="width:80px"/>
+    </div>
+    <div id="ctrl-mes" style="display:none">
+      <input type="month" id="perf-mes"/>
+    </div>
+    <div id="ctrl-rango" style="display:none">
+      <input type="date" id="perf-desde"/>
+      <span>→</span>
+      <input type="date" id="perf-hasta"/>
+    </div>
+  </div>
+  <div class="perf-export-bar">
+    <span class="perf-export-lbl">Exportar historial:</span>
+    <button class="btn-export-xlsx" id="perf-export-excel"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Excel</button>
+    <button class="btn-export-pdf"  id="perf-export-pdf"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+  </div>
+  <div class="dlg-scroll" id="perf-historial">
+    <div class="perf-loading">Cargando…</div>
+  </div>
+</dialog>
+
+<!-- MODAL NOVEDAD -->
+<dialog id="modal-novedad">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="mn-nom">Docente</h2>
+      <p id="mn-car">Cargo</p>
+    </div>
+    <button class="btn-x" id="xnov">✕</button>
+  </div>
+  <div class="nov-fecha-bar">
+    <span class="nov-fecha-lbl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Fecha:</span>
+    <input type="date" id="nov-fecha-input"/>
+    <button id="nov-btn-hoy">Hoy</button>
+  </div>
+  <div id="nov-horario-dia"></div>
+  <div id="nov-parcial-bar" style="display:none" class="nov-parcial-wrap">
+    <span class="nov-dur-lbl">⚠️ ¿Es falta parcial?</span>
+    <label><input type="radio" name="nov-parcial" value="completa" checked> Falta completa del día</label>
+    <label><input type="radio" name="nov-parcial" value="parcial"> Uno o más módulos</label>
+    <div id="nov-parcial-modulos" style="display:none;margin-top:.4rem;width:100%">
+      <div style="font-size:.72rem;color:#6B7280;margin-bottom:.3rem">Seleccioná los módulos que faltó (podés marcar más de uno):</div>
+      <div id="nov-modulos-lista" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+    </div>
+  </div>
+  <div id="nov-adelanto-bar" style="display:none" class="nov-adelanto-wrap">
+    <span class="nov-dur-lbl">⏩ Adelanto:</span>
+    <span>¿Qué día compensa?</span>
+    <input type="date" id="nov-adelanto-compensa"/>
+    <span style="font-size:.7rem;color:#6B7280">(opcional)</span>
+    <div class="nov-dur-btns">
+      <button class="btn-sec btn-sm" id="nov-ade-cancelar">Cancelar</button>
+      <button class="btn-p  btn-sm" id="nov-ade-confirmar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirmar
+      </button>
+    </div>
+  </div>
+  <div id="nov-duracion-bar" style="display:none" class="nov-duracion-wrap">
+    <div class="nov-dur-tipo-lbl">📅 <strong id="nov-dur-tipo-nombre"></strong></div>
+    <label><input type="radio" name="nov-dur-tipo" value="dia" checked> Solo este día</label>
+    <label><input type="radio" name="nov-dur-tipo" value="rango"> Rango de fechas</label>
+    <label><input type="radio" name="nov-dur-tipo" value="dias"> Cantidad de días hábiles</label>
+    <div id="nov-dur-rango" style="display:none">
+      <span>Hasta:</span><input type="date" id="nov-dur-hasta"/>
+    </div>
+    <div id="nov-dur-cant" style="display:none">
+      <input type="number" id="nov-dur-dias" min="1" max="365" value="1" style="width:60px"/> días hábiles
+    </div>
+    <div id="nov-comentario-bar" style="width:100%;margin-top:.4rem">
+      <label style="font-size:.72rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.2rem">Comentario / motivo (opcional)</label>
+      <textarea id="nov-comentario" rows="2" placeholder="Ej: presentó certificado médico, reunión institucional..."
+        style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:.4rem .7rem;
+               font-family:inherit;font-size:.8rem;color:var(--primary);resize:vertical;outline:none;
+               transition:border-color .15s"></textarea>
+    </div>
+    <div class="nov-dur-btns">
+      <button class="btn-sec btn-sm" id="nov-dur-cancelar">Cancelar</button>
+      <button class="btn-p  btn-sm" id="nov-dur-confirmar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Confirmar
+      </button>
+    </div>
+  </div>
+
+
+
+<div id="nov-estado-bar"></div>
+<div class="nov-grid" id="nov-grid"></div>
+</dialog>
+
+<!-- MODAL DOCENTE -->
+<dialog id="modal-docente">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="mde-tit">Nuevo docente</h2>
+      <p id="mde-sub">Completá los datos</p>
+    </div>
+    <button class="btn-x" id="xdoc">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <input type="hidden" id="mde-id"/>
+    <div style="display:flex;gap:.6rem">
+      <div class="field" style="flex:1">
+        <label>Apellido/s</label>
+        <input id="mde-apellido" type="text" placeholder="Ej: González"/>
+      </div>
+      <div class="field" style="flex:1.4">
+        <label>Nombre/s</label>
+        <input id="mde-nom" type="text" placeholder="Ej: María José"/>
+      </div>
+    </div>
+    <div id="mde-nivel-field-wrap">
+    <div class="field">
+      <label>Nivel educativo</label>
+      <div class="nivel-radio-group"><label class="nivel-radio-opt"><input type="radio" name="mde-nivel" value="profesores" checked/><span>👨‍🏫 Profesores</span></label></div>
+    </div>
+    </div>
+    <div class="field" id="mde-area-field">
+      <label id="mde-area-label">Área / Departamento</label>
+      <input id="mde-area" type="text" placeholder="Ej: Ciencias Exactas, Lengua, Educación Física…"/>
+      <p style="font-size:.7rem;color:#9CA3AF;margin:.2rem 0 0">Opcional — para agrupar dentro del nivel</p>
+    </div>
+    <div class="field">
+      <label>Cargo / Rol</label>
+      <input id="mde-car" type="text" placeholder="Ej: Profesor, Preceptor, Directivo"/>
+    </div>
+    <div class="field jub-field" id="jub-field-wrap">
+      <label class="jub-toggle-lbl">
+        <input type="checkbox" id="mde-jubilado"/>
+        <span class="jub-toggle-txt">🏅 Jubilado/a</span>
+      </label>
+      <span class="jub-toggle-hint">Aparece en la grilla pero no suma en porcentajes</span>
+    </div>
+    <div class="field">
+      <label>Tipo de horas</label>
+      <div class="tipo-hs-wrap">
+        <label class="tipo-hs-opt">
+          <input type="radio" name="mde-tipo-hs" value="catedra" checked/>
+          <span>Horas cátedra <small>(40 min)</small></span>
+        </label>
+        <label class="tipo-hs-opt">
+          <input type="radio" name="mde-tipo-hs" value="reloj"/>
+          <span>Horas reloj <small>(60 min)</small></span>
+        </label>
+      </div>
+      <p class="tipo-hs-hint" id="tipo-hs-hint"></p>
+    </div>
+    <div class="field">
+      <label>Materias / Asignaturas</label>
+      <input id="mde-materias" type="text" placeholder="Ej: Matemáticas, Física, Química (separadas por coma)"/>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="section-lbl" style="margin-bottom:.7rem">Faltas registradas</div>
+      <div class="faltas-row">
+        <div class="faltas-f">
+          <label>Faltas del mes</label>
+          <input id="mde-fm" type="number" min="0" value="0"/>
+          <button class="reset-lnk" data-t="mde-fm">↺ Reiniciar a 0</button>
+        </div>
+        <div class="faltas-f">
+          <label>Faltas del año</label>
+          <input id="mde-fa" type="number" min="0" value="0"/>
+          <button class="reset-lnk" data-t="mde-fa">↺ Reiniciar a 0</button>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="section-lbl" style="margin-bottom:.6rem"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg> Grupos</div>
+      <div id="mde-grupos-sel" class="grupos-sel-wrap"></div>
+    </div>
+    <div class="divider"></div>
+    <div class="field">
+      <label>Notas / Observaciones</label>
+      <textarea id="mde-notas" rows="3" placeholder="Observaciones internas sobre el docente..." style="border:1.5px solid var(--border);border-radius:10px;padding:.52rem .85rem;font-family:inherit;font-size:.87rem;color:var(--primary);outline:none;resize:vertical;width:100%;transition:border-color .15s"></textarea>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="section-lbl" style="margin-bottom:.75rem">📅 Horario semanal</div>
+      <div class="horario-editor" id="horario-editor"></div>
+      <div class="hs-preview" id="hs-preview">Total semanal: <strong>0 hs</strong></div>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <div id="mde-left"></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="canceldoc">Cancelar</button>
+      <button class="btn-p"   id="savedoc">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL CONFIRMAR -->
+<dialog id="modal-confirm">
+  <div class="dlg-hdr">
+    <div><h2>Confirmar eliminación</h2></div>
+    <button class="btn-x" id="xconf">✕</button>
+  </div>
+  <div class="confirm-body">
+    <div class="ci">⚠️</div>
+    <p>¿Eliminás a <strong id="conf-nom"></strong>?<br>Esta acción no se puede deshacer.</p>
+    <div class="confirm-btns">
+      <button class="btn-sec"    id="conf-cancel">Cancelar</button>
+      <button class="btn-danger" id="conf-ok">Sí, eliminar</button>
+    </div>
+  </div>
+</dialog>
+
+
+<!-- MODAL IMPORTAR EXCEL -->
+<dialog id="modal-importar">
+  <div class="dlg-hdr">
+    <div><h2>Importar archivo</h2><p>Excel (.xlsx), Word (.docx) o PDF (.pdf)</p></div>
+    <button class="btn-x" id="ximportar">✕</button>
+  </div>
+  <div class="dlg-scroll">
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem;background:#F3F4F6;border-radius:10px;padding:4px">
+      <button id="imp-modo-docentes" class="imp-modo-btn imp-modo-activo">👤 Importar docentes</button>
+      <button id="imp-modo-registros" class="imp-modo-btn">📋 Importar registros</button>
+    </div>
+    <div id="imp-panel-docentes">
+      <div class="imp-instrucciones">
+        <div class="imp-titulo">Columnas reconocidas (Excel) o campos (Word):</div>
+        <div class="imp-cols">
+          <span class="imp-col req">Nombre</span><span class="imp-col req">Apellido</span>
+          <span class="imp-col opt">Cargo</span><span class="imp-col opt">Materias</span>
+          <span class="imp-col opt">Grupo</span><span class="imp-col opt">Notas</span>
+          <span class="imp-col opt">Lunes entrada / salida</span><span class="imp-col opt">Martes entrada / salida</span>
+          <span class="imp-col opt">Miercoles entrada / salida</span><span class="imp-col opt">Jueves entrada / salida</span>
+          <span class="imp-col opt">Viernes entrada / salida</span>
+        </div>
+        <p class="imp-nota">Verde = obligatorio. Para Word: cada docente en un párrafo con formato <strong>Apellido, Nombre | Cargo | Materias</strong>.</p>
+      </div>
+      <div class="imp-drop-zone" id="imp-drop-zone">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p>Arrastrá tu archivo .xlsx, .docx o .pdf acá<br><span>o hacé click para seleccionar</span></p>
+        <input type="file" id="imp-file-input" accept=".xlsx,.xls,.docx,.pdf" style="display:none"/>
+      </div>
+      <div id="imp-preview" style="display:none">
+        <div class="imp-preview-header">
+          <span id="imp-preview-count"></span>
+          <div class="imp-preview-acciones">
+            <label class="imp-check-wrap"><input type="checkbox" id="imp-sobreescribir"/> Sobreescribir si ya existe</label>
+          </div>
+        </div>
+        <div class="rg-tabla-wrap"><table class="rg-tabla" id="imp-tabla">
+          <thead><tr><th></th><th>Apellido</th><th>Nombre</th><th>Cargo</th><th>Materias</th><th>Horario</th></tr></thead>
+          <tbody id="imp-tbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+    <div id="imp-panel-registros" style="display:none">
+      <div class="imp-instrucciones">
+        <div class="imp-titulo">Importar desde un reporte PDF de asistencia</div>
+        <p class="imp-nota">Subí un PDF exportado por esta app. Se cargan todas las novedades y se crean los docentes que no existan.</p>
+      </div>
+      <div class="imp-drop-zone" id="imp-drop-zone-reg">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <p>Arrastrá el PDF de reporte acá<br><span>o hacé click para seleccionar</span></p>
+        <input type="file" id="imp-file-reg" accept=".pdf" style="display:none"/>
+      </div>
+      <div id="imp-reg-preview" style="display:none">
+        <div id="imp-reg-resumen" style="background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:.7rem 1rem;font-size:.82rem;color:#3730A3;margin-bottom:.8rem"></div>
+        <div id="imp-reg-lista" style="display:flex;flex-direction:column;gap:.4rem;max-height:35vh;overflow-y:auto"></div>
+      </div>
+      <div id="imp-reg-progreso" style="display:none;padding:1rem 0">
+        <div id="imp-reg-prog-txt" style="font-size:.85rem;color:#374151;margin-bottom:.6rem">Importando...</div>
+        <div style="background:#E0E7FF;border-radius:99px;height:7px;overflow:hidden">
+          <div id="imp-reg-prog-bar" style="background:linear-gradient(90deg,#4F46E5,#6366F1);height:100%;width:0%;transition:width .3s"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <div></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="imp-cancelar">Cancelar</button>
+      <button class="btn-p" id="imp-guardar" disabled>Importar docentes</button>
+      <button class="btn-p" id="imp-guardar-reg" style="display:none" disabled>Confirmar importación</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL TENDENCIAS -->
+<dialog id="modal-tendencias">
+  <div class="dlg-hdr">
+    <div><h2>Tendencias de ausentismo</h2><p id="tend-subtit">Evolución mensual del año</p></div>
+    <button class="btn-x" id="xtend">✕</button>
+  </div>
+  <div class="perf-periodo-bar" style="flex-wrap:wrap;gap:.5rem">
+    <select id="tend-anio"></select>
+    <select id="tend-grupo"><option value="">Todos los grupos</option></select>
+    <select id="tend-vista">
+      <option value="anual">📊 Vista anual</option>
+      <option value="mes">📅 Por mes</option>
+    </select>
+    <div id="tend-ctrl-mes" style="display:none">
+      <select id="tend-mes-sel" style="border:1.5px solid var(--border);border-radius:8px;padding:.3rem .5rem;font-size:.82rem;color:var(--primary)">
+        <option value="01">Enero</option><option value="02">Febrero</option>
+        <option value="03">Marzo</option><option value="04">Abril</option>
+        <option value="05">Mayo</option><option value="06">Junio</option>
+        <option value="07">Julio</option><option value="08">Agosto</option>
+        <option value="09">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
+      </select>
+    </div>
+  </div>
+  <div class="dlg-scroll" id="tend-contenido">
+    <div class="perf-loading">Cargando…</div>
+  </div>
+</dialog>
+
+
+<!-- MODAL DUPLICADO DOCENTE -->
+<dialog id="modal-duplicado">
+  <div class="dlg-hdr">
+    <div><h2>⚠️ Docente duplicado</h2><p>Ya existe un docente con ese nombre</p></div>
+  </div>
+  <div class="confirm-body">
+    <div class="ci">👤</div>
+    <p>Ya hay un docente registrado como:</p>
+    <p style="font-size:1rem;font-weight:800;color:var(--primary);margin:.5rem 0" id="dup-nombre-existente"></p>
+    <p style="font-size:.8rem;color:var(--muted)" id="dup-cargo-existente"></p>
+    <p style="margin-top:.75rem;font-size:.82rem">¿Qué querés hacer?</p>
+    <div class="confirm-btns" style="flex-direction:column;gap:.4rem">
+      <button class="btn-p"       id="dup-editar">Editar el existente</button>
+      <button class="btn-sec"     id="dup-igual">Guardar igual como nuevo</button>
+      <button class="btn-danger"  id="dup-cancelar">Cancelar</button>
+    </div>
+  </div>
+</dialog>
+
+
+<!-- MODAL ELIMINAR MASIVO -->
+<dialog id="modal-eliminar-masivo">
+  <div class="dlg-hdr">
+    <div><h2>Eliminar docentes</h2><p id="elim-count">0 seleccionados</p></div>
+    <button class="btn-x" onclick="document.getElementById('modal-eliminar-masivo').close()">✕</button>
+  </div>
+  <div class="dlg-scroll" style="gap:.3rem">
+    <div style="display:flex;align-items:center;gap:.5rem;padding:.25rem 0;border-bottom:1px solid var(--border);margin-bottom:.25rem">
+      <input type="checkbox" id="elim-sel-todos"/>
+      <label for="elim-sel-todos" style="font-size:.8rem;font-weight:600;cursor:pointer">Seleccionar todos</label>
+    </div>
+    <div id="elim-lista"></div>
+  </div>
+  <div class="dlg-footer">
+    <div></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="elim-cancelar">Cancelar</button>
+      <button class="btn-danger" id="elim-confirmar" disabled>Eliminar seleccionados</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast-c"></div>
+
+<!-- MODAL AÑO NUEVO -->
+<dialog id="modal-anio-nuevo">
+  <div class="dlg-hdr">
+    <div>
+      <h2>📅 Año <span id="man-anio-nuevo"></span></h2>
+      <p>Este año no tiene docentes cargados aún</p>
+    </div>
+  </div>
+  <div class="man-body">
+    <div class="man-icon">🎉</div>
+    <p>¿Querés copiar los docentes de <strong><span id="man-anio-ant"></span></strong> a este año?</p>
+    <p class="man-sub">Se copian nombre, cargo, horario, grupos y materias.<br>Las faltas y novedades <strong>empiezan desde cero</strong>.</p>
+    <div class="man-btns">
+      <button class="btn-sec" id="man-cancelar">Cancelar</button>
+      <button class="btn-sec" id="man-vacio">Empezar vacío</button>
+      <button class="btn-p"   id="man-copiar">Sí, copiar docentes</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- MODAL JUBILADOS -->
+<dialog id="modal-jubilados">
+  <div class="dlg-hdr">
+    <div>
+      <h2>🏅 Jubilados</h2>
+      <p>Docentes retirados — podés consultar su perfil e historial</p>
+    </div>
+    <button class="btn-x" id="xjubilados">✕</button>
+  </div>
+  <div class="dlg-scroll" id="jubilados-lista"></div>
+</dialog>
+
+<!-- MODAL COPIAR DOCENTES -->
+
+<!-- MODAL LEGAJO DIGITAL -->
+<dialog id="modal-legajo">
+  <div class="dlg-hdr">
+    <div>
+      <h2 id="leg-tit">Legajo</h2>
+      <p id="leg-sub"></p>
+    </div>
+    <button class="btn-x" id="xleg">✕</button>
+  </div>
+  <div class="dlg-scroll" style="gap:.9rem">
+    <input type="hidden" id="leg-novedadId"/>
+    <div class="field">
+      <label>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        N° de trámite / referencia CIDI
+      </label>
+      <input id="leg-referencia" type="text" placeholder="Ej: EXP-2025-00012345-GDEBA-MEC"/>
+    </div>
+    <div class="field">
+      <label>Observaciones adicionales</label>
+      <textarea id="leg-comentario-ext" rows="3"
+        placeholder="Ej: Presentó certificado en secretaría el 15/05, aprobado por directivo..."
+        style="border:1.5px solid var(--border);border-radius:10px;padding:.52rem .85rem;font-family:inherit;font-size:.87rem;color:var(--primary);outline:none;resize:vertical;width:100%;transition:border-color .15s"></textarea>
+    </div>
+    <div class="divider"></div>
+    <div class="field">
+      <label>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        Adjuntar archivo (PDF, imagen)
+      </label>
+      <div id="leg-adjunto-actual"></div>
+      <div class="leg-file-zone" id="leg-file-zone" onclick="document.getElementById('leg-file-input').click()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Hacé click para seleccionar un archivo</span>
+        <small>PDF, JPG, PNG — máx. 5 MB</small>
+      </div>
+      <input type="file" id="leg-file-input" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display:none"/>
+      <div class="leg-file-preview" id="leg-file-preview" style="display:none">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        <span id="leg-file-nombre"></span>
+        <button onclick="document.getElementById('leg-file-input').value='';document.getElementById('leg-file-preview').style.display='none'" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:.8rem">✕</button>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-footer">
+    <div></div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-sec" id="leg-cancelar">Cancelar</button>
+      <button class="btn-p"   id="leg-guardar">Guardar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>window.NIVEL_ACTIVO = 'profesores';</script>
+<!-- Firebase SDK (NO modular, versión compat para evitar problemas de import) -->
+<!-- Firebase Storage -->
+<!-- PDF.js para leer PDFs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- mammoth para Word (.docx) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<!-- SheetJS para Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- jsPDF para PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+
+
+
+  <!-- MODAL PAPELERA -->
+  <dialog id="modal-papelera" style="border:none;border-radius:16px;padding:0;max-width:520px;width:95%;box-shadow:0 8px 40px rgba(0,0,0,.2);">
+    <div style="background:linear-gradient(135deg,#B91C1C,#DC2626);padding:.9rem 1.2rem;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between">
+      <span style="color:#fff;font-weight:700;font-size:.95rem;">♻️ Papelera — Docentes eliminados</span>
+      <button id="xpapelera" onclick="document.getElementById('modal-papelera').close()" style="background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div style="padding:1.2rem 1.4rem;background:#fff;max-height:60vh;overflow-y:auto">
+      <p style="font-size:.78rem;color:#6B7280;margin:0 0 .8rem">Los docentes eliminados pueden ser restaurados sin perder sus novedades.</p>
+      <div id="pap-lista"><p style="color:#9ca3af;font-size:.85rem;">Cargando...</p></div>
+    </div>
+  </dialog>
+</body>
+</html>
