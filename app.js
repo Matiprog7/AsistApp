@@ -171,6 +171,50 @@ function esAusencia(t){ return !esPresenteDia(t); }
 // Si no existe, se usa el legacy (para no romper la instalación actual).
 
 var db=null, ROL=null;
+
+// ══════════════════════════════════════════════════════
+//  ROLES Y PERMISOS
+// ══════════════════════════════════════════════════════
+//  directivo      → todo: todos los niveles, editar, eliminar, config, reportes, usuarios
+//  administrativo → asistencia de profesores, personal docente y estudiantes
+//  preceptor      → asistencia de profesores y estudiantes
+//  profesor       → asistencia de estudiantes
+//  pendiente      → entró con Google pero aún no tiene rol asignado: sin acceso
+//  invitado       → botón "ingresar sin cuenta": no ve nada
+var ROL_LABELS = {
+  directivo:'📋 Directivo', administrativo:'🗂️ Administrativo', preceptor:'📝 Preceptor',
+  profesor:'👤 Profesor', pendiente:'⏳ Pendiente', invitado:'👁️ Invitado'
+};
+var ROLES_ASIGNABLES = ['pendiente','profesor','preceptor','administrativo','directivo'];
+var ROL_ERROR_VERIF = false;
+function normalizarRol(r){
+  r = (r||'').toString().toLowerCase().trim();
+  if(r==='admin') return 'directivo';          // compatibilidad: el viejo admin es directivo
+  if(r==='docente') return 'profesor';         // compatibilidad: el viejo docente es profesor
+  if(['directivo','administrativo','preceptor','profesor'].indexOf(r)>=0) return r;
+  return 'pendiente';
+}
+function esFull(){ return ROL==='directivo'; }
+// ¿Puede el usuario actual ver y poner asistencia a esta persona (docente / personal / estudiante)?
+function puedeRegistrar(doc){
+  if(!doc) return false;
+  if(esFull()) return true;
+  var esEst = (doc.nivel||'')==='estudiantes';
+  if(ROL==='administrativo') return true;
+  if(ROL==='preceptor')      return esEst || !esCargoReloj(doc.cargo);   // profesores + estudiantes (no personal no docente)
+  if(ROL==='profesor')       return esEst;
+  return false;
+}
+function nombreDeUsuario(user){
+  if(!user) return '';
+  var m = user.user_metadata || {};
+  return m.full_name || m.name || user.displayName || user.email || '';
+}
+function fotoDeUsuario(user){
+  if(!user) return '';
+  var m = user.user_metadata || {};
+  return m.avatar_url || m.picture || user.photoURL || '';
+}
 var TODOS_DOCENTES=[], TODOS_JUBILADOS=[], TODOS_GRUPOS=[], USUARIO_ACTUAL=null;
 var CONFIG = { cicloInicio:'2026-02-18', cicloFin:'2026-12-30', feriados:[] };
 var ANIO_SEL = new Date().getFullYear();
@@ -215,36 +259,81 @@ function iniciarFirebase(){
   }catch(err){ console.error(err); mostrarError(err.message); }
 }
 
+// Busca el rol del usuario en la tabla `usuarios`. Si no está registrado queda
+// como 'pendiente' (sin acceso) y se deja una solicitud para que un directivo lo designe.
+function resolverRol(user){
+  ROL_ERROR_VERIF = false;
+  var email = (user.email||'').toLowerCase();
+  return db.from('usuarios').select('rol,nombre').ilike('email', email).limit(1)
+    .then(function(res){
+      if(res.error) throw res.error;
+      var fila = (res.data && res.data[0]) || null;
+      if(fila){
+        ROL = normalizarRol(fila.rol);
+      } else {
+        ROL = 'pendiente';
+        // Registrar la solicitud (si la política lo permite; si falla no pasa nada)
+        return db.from('usuarios').insert({ email: email, nombre: nombreDeUsuario(user), rol: 'pendiente' })
+          .then(function(){}, function(){});
+      }
+    })
+    .catch(function(){ ROL = 'pendiente'; ROL_ERROR_VERIF = true; });
+}
+var _authResolviendo = null;
+function iniciarSesionApp(user){
+  USUARIO_ACTUAL = user;
+  if(_authResolviendo === user.id+'|'+user.email) return;   // evita doble ejecución (onAuthStateChange + getSession)
+  _authResolviendo = user.id+'|'+user.email;
+  resolverRol(user).then(function(){ _authResolviendo = null; mostrarApp(user); });
+}
 function manejarAuth(){
   db.auth.onAuthStateChange(function(event, session){
     var user = session ? session.user : null;
-    if(user){
-      USUARIO_ACTUAL = user;
-      db.from('usuarios').select('rol,nombre').eq('email', user.email).maybeSingle()
-        .then(function(res){
-          ROL = (res.data && res.data.rol) || 'docente';
-        })
-        .catch(function(){ ROL = 'docente'; })
-        .then(function(){ mostrarApp(user); });
-    } else {
-      mostrarLoginScreen();
-    }
+    if(user){ iniciarSesionApp(user); }
+    else { _authResolviendo = null; mostrarLoginScreen(); }
   });
   // Disparar estado inicial (por si ya hay sesión activa al cargar)
   db.auth.getSession().then(function(res){
     var session = res.data ? res.data.session : null;
     var user = session ? session.user : null;
-    if(user){
-      USUARIO_ACTUAL = user;
-      db.from('usuarios').select('rol,nombre').eq('email', user.email).maybeSingle()
-        .then(function(res2){
-          ROL = (res2.data && res2.data.rol) || 'docente';
-        })
-        .catch(function(){ ROL = 'docente'; })
-        .then(function(){ mostrarApp(user); });
-    } else {
-      mostrarLoginScreen();
-    }
+    if(user){ iniciarSesionApp(user); }
+    else { mostrarLoginScreen(); }
+  });
+}
+
+// Pantalla para quien entró con Google pero todavía no tiene rol
+function mostrarPendiente(user){
+  var ls = document.getElementById('login-screen'); if(ls) ls.style.display='none';
+  var h = document.body.querySelector('header'); if(h) h.style.display='none';
+  var m = document.body.querySelector('main');   if(m) m.style.display='none';
+  var ub = document.getElementById('user-bar'); if(ub) ub.style.display='none';
+  var el = document.getElementById('pendiente-screen');
+  if(el) el.remove();
+  el = document.createElement('div');
+  el.id = 'pendiente-screen';
+  el.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#f1f5f9;font-family:inherit;padding:1rem';
+  var email = (user && user.email) ? user.email : '';
+  var msg = ROL_ERROR_VERIF
+    ? 'No pudimos verificar tu cuenta en este momento. Probá de nuevo en unos segundos.'
+    : 'Tu cuenta se registró correctamente, pero todavía no tiene un rol asignado. Un directivo debe designarte como <strong>profesor, preceptor, administrativo o directivo</strong> para que puedas ingresar.';
+  el.innerHTML =
+    '<div style="background:#fff;max-width:420px;width:100%;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.12);padding:2rem;text-align:center">'+
+      '<div style="font-size:2.4rem">'+(ROL_ERROR_VERIF?'⚠️':'⏳')+'</div>'+
+      '<h2 style="margin:.6rem 0 .4rem;font-size:1.15rem;color:#0f172a">'+(ROL_ERROR_VERIF?'No se pudo verificar':'Cuenta pendiente de aprobación')+'</h2>'+
+      '<p style="color:#475569;font-size:.88rem;line-height:1.5;margin:.3rem 0 1rem">'+msg+'</p>'+
+      (email?'<p style="font-size:.8rem;color:#64748b;background:#f8fafc;border-radius:8px;padding:.5rem;margin:0 0 1.2rem;word-break:break-all">'+email.replace(/</g,'&lt;')+'</p>':'')+
+      '<div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap">'+
+        '<button id="pend-reintentar" style="padding:.55rem 1rem;border-radius:8px;border:none;background:#2563eb;color:#fff;font-weight:600;cursor:pointer">Ya me asignaron, reintentar</button>'+
+        '<button id="pend-salir" style="padding:.55rem 1rem;border-radius:8px;border:1px solid #cbd5e1;background:#fff;color:#334155;cursor:pointer">Cerrar sesión</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(el);
+  document.getElementById('pend-reintentar').addEventListener('click', function(){
+    el.remove(); _authResolviendo = null;
+    resolverRol(user).then(function(){ mostrarApp(user); });
+  });
+  document.getElementById('pend-salir').addEventListener('click', function(){
+    el.remove(); ROL = null; db.auth.signOut().then(mostrarLoginScreen);
   });
 }
 
@@ -280,6 +369,8 @@ function mostrarLoginScreen(){
 }
 
 function mostrarApp(user){
+  var _pend = document.getElementById('pendiente-screen'); if(_pend) _pend.remove();
+  if(user && ROL==='pendiente'){ mostrarPendiente(user); return; }
   document.getElementById('login-screen').style.display='none';
   document.getElementById('licencia-screen') && (document.getElementById('licencia-screen').style.display='none');
   document.body.querySelector('header').style.display='';
@@ -287,12 +378,13 @@ function mostrarApp(user){
   inicializarSelectorAnio();
 
   var bar = document.getElementById('user-bar');
-  var rolLabels = { admin:'🔑 Admin', directivo:'📋 Directivo', docente:'👤 Docente', invitado:'👁️ Invitado' };
+  var rolLabels = ROL_LABELS;
   if(user){
     bar.style.display='flex';
     var av = document.getElementById('user-avatar');
-    av.src=user.photoURL||''; av.style.display=user.photoURL?'':'none';
-    document.getElementById('user-name').textContent=user.displayName||user.email;
+    var _foto = fotoDeUsuario(user);
+    av.src=_foto; av.style.display=_foto?'':'none';
+    document.getElementById('user-name').textContent=nombreDeUsuario(user);
     document.getElementById('user-role').textContent=rolLabels[ROL]||ROL||'Invitado';
     document.getElementById('user-role').className='role-badge '+(ROL||'invitado');
   } else {
@@ -303,8 +395,8 @@ function mostrarApp(user){
     document.getElementById('user-role').className='role-badge invitado';
   }
 
-  var esAdmin      = ROL==='admin';
-  var esDirectivo  = ROL==='directivo';
+  var esAdmin      = esFull();
+  var esDirectivo  = esFull();
   var puedeExportar = esAdmin || esDirectivo;
   var puedeVerTodo  = esAdmin || esDirectivo;
 
@@ -340,6 +432,7 @@ function mostrarApp(user){
     });
   }
 
+  prepararBotonUsuarios();
   cargarYRender();
 }
 (function(){ var b=document.getElementById('btn-login-google'); if(b) b.addEventListener('click',function(){
@@ -566,8 +659,9 @@ function buildCard(doc){
     '<div class="card-top">'+
       '<div class="card-actions">'+
         '<button class="btn-card btn-card-hist" data-action="historial"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil</button>'+
-        (ROL==='admin'?
-          '<button class="btn-card btn-card-nov"  data-action="novedad"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Registrar</button>'+
+        (puedeRegistrar(doc)?
+          '<button class="btn-card btn-card-nov"  data-action="novedad"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Registrar</button>':'')+
+        (esFull()?
           '<button class="btn-card btn-card-edit" data-action="editar">✏️ Editar</button>'+
           '<button class="btn-card btn-card-del"  data-action="eliminar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>'
         :'')+
@@ -580,7 +674,7 @@ function buildCard(doc){
       '<span style="font-size:.61rem;color:#9CA3AF">'+fa+' falta'+(fa!==1?'s':'')+' anuales</span>'+
     '</div>';
   card.querySelector('[data-action="historial"]').addEventListener('click',function(e){ e.stopPropagation(); abrirPerfil(doc); });
-  if(ROL==='admin'){
+  if(puedeRegistrar(doc)){
     var btnNov = card.querySelector('[data-action="novedad"]');
     var btnEdi = card.querySelector('[data-action="editar"]');
     var btnDel = card.querySelector('[data-action="eliminar"]');
@@ -727,21 +821,10 @@ document.getElementById('filtro-reset').addEventListener('click',function(){
 //  RENDER
 // ══════════════════════════════════════════════════════
 function renderDocentes(lista){
-  // Docente o invitado: solo ve su propio perfil
-  if(ROL==='docente' || ROL==='invitado'){
-    if(USUARIO_ACTUAL){
-      var emailNorm  = (USUARIO_ACTUAL.email||'').toLowerCase();
-      var nombreNorm = (USUARIO_ACTUAL.displayName||'').toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      lista = lista.filter(function(d){
-        var dNom   = (d.nombre||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-        var dEmail = (d.email||'').toLowerCase();
-        return dEmail===emailNorm || dNom===nombreNorm ||
-               (nombreNorm && dNom.includes(nombreNorm.split(' ')[0]));
-      });
-    } else {
-      lista = []; // invitado sin cuenta: no ve nada
-    }
+  // Cada rol ve solo a quienes puede registrar: directivo todo; administrativo todos;
+  // preceptor profesores + estudiantes; profesor estudiantes; invitado/pendiente nada.
+  if(!esFull()){
+    lista = (ROL==='invitado' || !ROL) ? [] : lista.filter(puedeRegistrar);
   }
   // Directivo y admin ven todo
   TODOS_DOCENTES=lista;
@@ -749,7 +832,10 @@ function renderDocentes(lista){
   grid.innerHTML='';
   if(!lista.length){
     grid.innerHTML='<div class="empty-state"><div style="font-size:2.5rem">📋</div>'+
-      '<p>No hay docentes. Usá <strong>"＋ Nuevo docente"</strong> para agregar.</p></div>';
+      (ROL==='profesor' && NIVEL_ACTIVO!=='estudiantes'
+        ? '<p>Tu rol (Profesor) permite registrar asistencia de <strong>estudiantes</strong>. Ingresá desde la sección Estudiantes.</p></div>'
+        : (esFull() ? '<p>No hay docentes. Usá <strong>"＋ Nuevo docente"</strong> para agregar.</p></div>'
+                    : '<p>No hay personas para mostrar con tu rol.</p></div>'));
     document.getElementById('filtro-count').textContent='0 docentes';
     return;
   }
@@ -969,12 +1055,12 @@ mPerf.addEventListener('click',function(e){ if(e.target===mPerf) mPerf.close(); 
 
 function abrirPerfil(doc){
   docPerfil=doc;
-  var esAdmin=ROL==='admin';
-  var puedeExportarPerfil = ROL==='admin' || ROL==='directivo';
+  var esAdmin=esFull();
+  var puedeExportarPerfil = esFull();
   document.getElementById('perf-export-excel').style.display=puedeExportarPerfil?'':'none';
   document.getElementById('perf-export-pdf').style.display=puedeExportarPerfil?'':'none';
   var btnRegPerfil=document.getElementById('perf-btn-registrar');
-  if(btnRegPerfil) btnRegPerfil.style.display=esAdmin?'':'none';
+  if(btnRegPerfil) btnRegPerfil.style.display=puedeRegistrar(doc)?'':'none';
   // Botón editar en perfil
   var btnEditarPerfil=document.getElementById('perf-btn-editar');
   if(btnEditarPerfil){
@@ -1098,6 +1184,7 @@ function renderHistorial(items,desde,hasta){
   }
 
   // Stats: primero presente, luego el resto sin presente
+  var totalDiasHabiles = diasPresentes + items.filter(function(i){ return i.tipo!=='presente'&&i.tipo!==undefined; }).length;
   var statsHTML=jubBanner+'<div class="perf-stats">'+
     '<div class="perf-stat-item presente">'+
       '<span class="perf-stat-icon">✅</span>'+
@@ -1119,7 +1206,6 @@ function renderHistorial(items,desde,hasta){
   var totalFaltasReales = (contadores.justificada||0) + (contadores.injustificada||0);
   var diasParaPct = diasPresentes + totalFaltasReales;
   var pctAsist = diasParaPct > 0 ? Math.round((diasPresentes / diasParaPct) * 100) : 100;
-  var totalDiasHabiles = diasPresentes + items.filter(function(i){ return i.tipo!=='presente'&&i.tipo!==undefined; }).length;
   var resumenHTML='<div class="perf-resumen-general">'+
     '<span>Dias habiles: <strong>'+totalDiasHabiles+'</strong></span>'+
     '<span>Presentes: <strong>'+(contadores.presente||0)+'</strong></span>'+
@@ -1127,7 +1213,7 @@ function renderHistorial(items,desde,hasta){
     '<span class="perf-pct-asist">Asistencia: <strong>'+pctAsist+'%</strong></span>'+
     '</div>';
 
-  var esAdmin = ROL==='admin';
+  var esAdmin = esFull();
   var listaHTML='';
   var itemsFiltrados=items.filter(function(i){ return i.tipo!=='presente'; });
   if(!itemsFiltrados.length){
@@ -1164,7 +1250,7 @@ function renderHistorial(items,desde,hasta){
           '<span class="hist-label">'+LABELS[item.tipo]+
             (item.modulos&&item.modulos.length?' <span class="hist-modulo">('+item.modulos.join(', ')+')</span>':
              item.modulo?' <span class="hist-modulo">('+item.modulo+')</span>':'')+
-            (item.comentario?'<span class="hist-comentario"> — '+item.comentario+'</span>':'')+
+            ((item.obs||item.comentario)?'<span class="hist-comentario"> — '+(item.obs||item.comentario)+'</span>':'')+
             legajoBadge+
             (item.medicoNombre||item.matriculaMedico
               ?'<span class="hist-medico-info">'+
@@ -1258,6 +1344,7 @@ function renderHorarioDia(doc, fecha){
 }
 
 function abrirNovedad(doc){
+  if(!puedeRegistrar(doc)){ toast('⛔ Tu rol no te permite registrar asistencia de esta persona',3500); return; }
   docActivo=doc; fechaNov=hoyStr();
   var nombreDisplay = (doc.apellido&&doc.apellido.trim())
     ? doc.apellido.trim().toUpperCase()+', '+soloNombre(doc.nombre,doc.apellido)
@@ -1292,6 +1379,7 @@ function _limpiarBarrasNov(){
 }
 
 function borrarRegistroNovedad(docId){
+  if(!puedeRegistrar(docActivo)){ toast('⛔ Tu rol no te permite modificar este registro',3500); return; }
   // Leer el registro para conocer su tipo, fecha y docenteId
   db.from('novedades').select('*').eq('id', docId).maybeSingle().then(function(res){
     if(res.error) throw res.error;
@@ -1652,6 +1740,8 @@ document.getElementById('nov-ade-cancelar').addEventListener('click', function()
 
 // Función central de guardado de novedad
 function ejecutarGuardadoNovedad(tipofinal, moduloFaltado, fechasARegistrar){
+  if(!puedeRegistrar(docActivo)){ toast('⛔ Tu rol no te permite registrar asistencia de esta persona',3500); return; }
+  if(tipofinal==='jubilacion' && !esFull()){ toast('⛔ Solo un directivo puede registrar una jubilación',3500); return; }
   var fecha = fechasARegistrar[0];
   var esHoy = fecha===hoyStr();
 
@@ -2323,8 +2413,8 @@ function buscarMatricula(){
       // Agrupar por docente
       var porDocente = {};
       items.forEach(function(it){
-        var k = it.docenteId;
-        if(!porDocente[k]) porDocente[k] = { nombre: it.docenteNombre||it.docenteId, registros: [] };
+        var k = it.docente_id||it.docenteId;
+        if(!porDocente[k]) porDocente[k] = { nombre: it.docenteNombre||((TODOS_DOCENTES.find(function(d){ return d.id===k; })||{}).nombre)||k, registros: [] };
         porDocente[k].registros.push(it);
       });
       var html = Object.keys(porDocente).map(function(did){
@@ -2702,9 +2792,6 @@ function cargarRanking(){
         }
         porDocente[doc.id].diasDebVenir = diasHab;
         porDocente[doc.id].presentesAuto = diasPresentes;
-        if(doc.nombre && doc.nombre.indexOf('Carina') >= 0){
-          console.log('DEBUG', doc.nombre, 'diasHab:', diasHab, 'presentes:', diasPresentes, 'faltas:', porDocente[doc.id].totalAusencias);
-        }
       });
 
       var ranking = TODOS_DOCENTES.map(function(doc){
@@ -3536,8 +3623,7 @@ function exportarReporte(formato){
       var hastaEfecInd = hasta > hoyStr() ? hoyStr() : hasta;
       var novDocInd = {};
       var fechaJubInd = null;
-      snap.docs.forEach(function(d){
-        var x=d.data();
+      snap.forEach(function(x){
         if(x.tipo!=='presente'&&!esFeriado(x.fecha)&&x.fecha>=desde&&x.fecha<=hasta) novDocInd[x.fecha]=x;
         if(x.tipo==='jubilacion'&&(!fechaJubInd||x.fecha<fechaJubInd)) fechaJubInd=x.fecha;
       });
@@ -3738,7 +3824,7 @@ function getFechaJubDoc(docId, mapaNovedades){
   var keys = Object.keys(mapaNovedades);
   for(var i=0;i<keys.length;i++){
     var n = mapaNovedades[keys[i]];
-    if(n.docenteId===docId && n.tipo==='jubilacion') return n.fecha;
+    if((n.docente_id||n.docenteId)===docId && n.tipo==='jubilacion') return n.fecha;
   }
   return null;
 }
@@ -3802,8 +3888,8 @@ function construirResumenPerfil(snap, desde, hasta){
 
   // Mapear novedades por fecha
   var novedadesPorFecha = {};
-  snap.docs.forEach(function(d){
-    var x = d.data();
+  var _arrSnap = Array.isArray(snap) ? snap : ((snap && snap.data) || []);
+  _arrSnap.forEach(function(x){
     if(x.tipo !== 'presente') novedadesPorFecha[x.fecha] = x;
   });
 
@@ -4722,7 +4808,7 @@ document.getElementById('rg-export-pdf').addEventListener('click', function(){
       .forEach(function(item){
         var f = new Date(item.fecha+'T12:00:00');
         var tipo = LABELS_SHORT[item.tipo]||item.tipo;
-        var extra = item.modulo ? ' ('+item.modulo+')' : (item.comentario ? ' — '+item.comentario : '');
+        var extra = item.modulo ? ' ('+item.modulo+')' : ((item.obs||item.comentario) ? ' — '+(item.obs||item.comentario) : '');
         detalle.push([r.nombre, diasSem[f.getDay()]+' '+item.fecha, tipo+extra]);
       });
   });
@@ -5186,13 +5272,18 @@ function _mkBtn(bg, color, label, iconSVG){
 }
 
 function _renderDetalleBackup(cont, b){
-  var empleados = (b.empleados||[]).filter(function(e){ return !e.eliminadoEn; });
+  var empleados = (b.empleados||[]).filter(function(e){
+    var el = e.eliminado_en;
+    if(el && typeof el==='object') return !(e.nivel ? el[e.nivel]===true : Object.keys(el).some(function(k){ return el[k]===true; }));
+    return !el;
+  });
   var novedades = b.novedades||[];
   // Agrupar novedades por docenteId
   var novPorDoc = {};
   novedades.forEach(function(n){
-    if(!novPorDoc[n.docenteId]) novPorDoc[n.docenteId] = [];
-    novPorDoc[n.docenteId].push(n);
+    var _did = n.docente_id||n.docenteId;
+    if(!novPorDoc[_did]) novPorDoc[_did] = [];
+    novPorDoc[_did].push(n);
   });
 
   if(!empleados.length){
@@ -5208,7 +5299,7 @@ function _renderDetalleBackup(cont, b){
   });
 
   empleados.forEach(function(emp){
-    var novs = (novPorDoc[emp._id]||[]).filter(function(n){ return n.tipo!=='presente'; })
+    var novs = (novPorDoc[emp.id||emp._id]||[]).filter(function(n){ return n.tipo!=='presente'; })
       .sort(function(a,c){ return a.fecha.localeCompare(c.fecha); });
 
     var nombre = (emp.apellido&&emp.apellido.trim())
@@ -5218,12 +5309,12 @@ function _renderDetalleBackup(cont, b){
     var row = document.createElement('div');
     row.style.cssText = 'padding:.35rem 0;border-bottom:1px solid var(--border);font-size:.77rem';
 
-    var presentes = (novPorDoc[emp._id]||[]).filter(function(n){ return n.tipo==='presente'; }).length;
+    var presentes = (novPorDoc[emp.id||emp._id]||[]).filter(function(n){ return n.tipo==='presente'; }).length;
 
     var html = '<div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">'
       +'<strong style="font-size:.8rem">'+escHTML(nombre)+'</strong>'
       +(emp.cargo ? '<span style="color:var(--muted);font-size:.7rem">'+escHTML(emp.cargo)+'</span>' : '')
-      +'<span style="margin-left:auto;color:var(--muted);font-size:.7rem">'+presentes+' presentes · '+(novPorDoc[emp._id]||[]).length+' registros</span>'
+      +'<span style="margin-left:auto;color:var(--muted);font-size:.7rem">'+presentes+' presentes · '+(novPorDoc[emp.id||emp._id]||[]).length+' registros</span>'
       +'</div>';
 
     if(novs.length){
@@ -6914,7 +7005,7 @@ function leerDatosDocente(){
           '<button class="btn-card btn-card-hist jub-btn-perfil">'+
             '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil'+
           '</button>'+
-          (ROL==='admin'?
+          (esFull()?
             '<button class="btn-card btn-card-edit jub-btn-editar">✏️ Editar</button>':
           '')+
         '</div>';
@@ -6923,7 +7014,7 @@ function leerDatosDocente(){
         modal.close();
         abrirPerfil(doc);
       });
-      if(ROL==='admin'){
+      if(esFull()){
         div.querySelector('.jub-btn-editar').addEventListener('click', function(){
           modal.close();
           abrirDocente(doc);
@@ -7059,18 +7150,6 @@ function leerDatosDocente(){
 // ║  FEATURE 1 — LEGAJO DIGITAL                         ║
 // ║  Referencia de trámite + adjunto por novedad         ║
 // ╚══════════════════════════════════════════════════════╝
-
-// Storage bucket (mismo proyecto Firebase)
-var FB_STORAGE_BUCKET = 'gestion-de-faltas.firebasestorage.app';
-
-// Inicializar Firebase Storage (compat)
-var storage = null;
-(function(){
-  try {
-    // firebase.storage() está disponible si se cargó el SDK de storage
-    if(firebase.storage) storage = firebase.storage();
-  } catch(e){}
-})();
 
 // Abre el modal de legajo para una novedad específica
 function abrirLegajo(novedadId, docenteNombre, tipoNovedad, fechaNovedad){
@@ -7215,7 +7294,7 @@ function abrirLegajo(novedadId, docenteNombre, tipoNovedad, fechaNovedad){
             toast('✅ Legajo guardado');
             modal.close();
             // Refrescar historial si está abierto
-            if(docPerfil) cargarHistorial(docPerfil, document.getElementById('perf-tipo-periodo').value);
+            if(docPerfil) cargarHistorial();
           })
           .catch(function(err){ toast('Error: '+err.message, 5000); })
           .finally(function(){ btn.disabled=false; btn.textContent='Guardar'; });
@@ -7425,7 +7504,7 @@ document.addEventListener('click', function(e){
 var _origRenderDocentes = renderDocentes;
 renderDocentes = function(lista){
   _origRenderDocentes(lista);
-  if(ROL !== 'admin' && ROL !== 'directivo') return;
+  if(!esFull()) return;
 
   var hoyISO = hoyStr();
 
@@ -7445,11 +7524,11 @@ renderDocentes = function(lista){
     // (necesitamos las más antiguas por docente para ver cuándo empezó el tratamiento)
     db.from('novedades').select('*').gte('fecha', inicioAnio).lte('fecha', hoyISO)
   ]).then(function(results){
-    var novVence = (results[0].data||[]).map(function(x){ x._id=x.id; return x; });
+    var novVence = (results[0].data||[]).map(function(x){ x._id=x.id; x.docenteId=x.docente_id; return x; });
 
     // Filtrar solo tipos con vencimiento, y solo los que empezaron hace 10+ días
     var novLargas = (results[1].data||[])
-      .map(function(x){ x._id=x.id; return x; })
+      .map(function(x){ x._id=x.id; x.docenteId=x.docente_id; return x; })
       .filter(function(x){
         return TIPOS_CON_VENCIMIENTO.indexOf(x.tipo) >= 0 && x.fecha <= fechaHace10;
       });
@@ -7786,14 +7865,14 @@ function _renderCalHTML(wrap, docs, dias, hoy, modo){
       var docId  = this.dataset.docid;
       var fecha  = this.dataset.fecha;
       var doc    = TODOS_DOCENTES.find(function(d){ return d.id===docId; });
-      if(!doc || ROL !== 'admin') return;
+      if(!doc || !puedeRegistrar(doc)) return;
       // Navegar a la fecha y abrir novedad
       fechaSeleccionada = fecha;
       document.getElementById('input-fecha-hdr').value = fecha;
       cambiarVista('cards');
       setTimeout(function(){ abrirNovedad(doc); }, 250);
     });
-    td.style.cursor = ROL === 'admin' ? 'pointer' : 'default';
+    td.style.cursor = esFull() ? 'pointer' : 'default';
   });
 
   // Click en cabecera fecha → ir a ese día en vista cards
@@ -8092,4 +8171,132 @@ function restaurarDocente(id, niveles){
       cargarYRender();
     })
     .catch(function(err){ toast('Error al restaurar: '+err.message, 5000); });
+}
+
+
+// ══════════════════════════════════════════════════════
+//  GESTIÓN DE USUARIOS (solo directivo): asignar rol a quien entra con Google
+// ══════════════════════════════════════════════════════
+function _escUsr(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function prepararBotonUsuarios(){
+  var bar = document.getElementById('user-bar');
+  if(!bar) return;
+  var btn = document.getElementById('btn-usuarios');
+  if(!esFull()){ if(btn) btn.style.display='none'; return; }
+  if(!btn){
+    btn = document.createElement('button');
+    btn.id = 'btn-usuarios';
+    btn.type = 'button';
+    btn.title = 'Usuarios y roles';
+    btn.style.cssText = 'background:rgba(255,255,255,.15);color:inherit;border:1px solid rgba(128,128,128,.35);border-radius:8px;padding:.25rem .6rem;font-size:.75rem;cursor:pointer;font-family:inherit;margin-right:.4rem;position:relative';
+    btn.innerHTML = '👥 Usuarios';
+    btn.addEventListener('click', abrirGestionUsuarios);
+    bar.insertBefore(btn, bar.firstChild);
+  }
+  btn.style.display = '';
+  // Marcar cuántos están pendientes
+  db.from('usuarios').select('email', {count:'exact', head:true}).eq('rol','pendiente').then(function(res){
+    var n = res && res.count ? res.count : 0;
+    var b = document.getElementById('btn-usuarios-badge');
+    if(b) b.remove();
+    if(n>0){
+      b = document.createElement('span');
+      b.id = 'btn-usuarios-badge';
+      b.textContent = n;
+      b.style.cssText = 'position:absolute;top:-6px;right:-6px;background:#dc2626;color:#fff;border-radius:999px;font-size:.62rem;min-width:16px;height:16px;line-height:16px;text-align:center;font-weight:700';
+      btn.appendChild(b);
+    }
+  }, function(){});
+}
+
+function abrirGestionUsuarios(){
+  if(!esFull()) return;
+  var dlg = document.getElementById('modal-usuarios-roles');
+  if(!dlg){
+    dlg = document.createElement('dialog');
+    dlg.id = 'modal-usuarios-roles';
+    dlg.style.cssText = 'border:none;border-radius:14px;padding:0;width:min(720px,94vw);max-height:88vh;box-shadow:0 20px 60px rgba(0,0,0,.3);background:#fff;color:#0f172a';
+    dlg.addEventListener('click', function(e){ if(e.target===dlg) dlg.close(); });
+    document.body.appendChild(dlg);
+  }
+  dlg.innerHTML =
+    '<div style="padding:1.1rem 1.3rem;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">'+
+      '<strong style="font-size:1rem">👥 Usuarios y roles</strong>'+
+      '<button id="usr-cerrar" style="border:none;background:none;font-size:1.2rem;cursor:pointer;color:#64748b">✕</button>'+
+    '</div>'+
+    '<div style="padding:.8rem 1.3rem;font-size:.76rem;color:#475569;background:#f8fafc;line-height:1.5">'+
+      '<b>Directivo:</b> todo · <b>Administrativo:</b> asistencia de profesores, personal docente y estudiantes · '+
+      '<b>Preceptor:</b> asistencia de profesores y estudiantes · <b>Profesor:</b> asistencia de estudiantes · '+
+      '<b>Pendiente:</b> sin acceso.'+
+    '</div>'+
+    '<div id="usr-lista" style="padding:.6rem 1.3rem;overflow:auto;max-height:50vh"><p style="color:#64748b;font-size:.85rem">Cargando…</p></div>'+
+    '<div style="padding:.9rem 1.3rem;border-top:1px solid #e2e8f0;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">'+
+      '<input id="usr-nuevo-email" type="email" placeholder="Pre-designar por email (Gmail)" style="flex:1;min-width:200px;padding:.45rem .6rem;border:1px solid #cbd5e1;border-radius:8px;font-size:.82rem">'+
+      '<select id="usr-nuevo-rol" style="padding:.45rem;border:1px solid #cbd5e1;border-radius:8px;font-size:.82rem">'+
+        ROLES_ASIGNABLES.filter(function(r){ return r!=='pendiente'; }).map(function(r){ return '<option value="'+r+'">'+(ROL_LABELS[r]||r)+'</option>'; }).join('')+
+      '</select>'+
+      '<button id="usr-nuevo-btn" style="padding:.45rem .9rem;border:none;border-radius:8px;background:#2563eb;color:#fff;font-weight:600;font-size:.82rem;cursor:pointer">Agregar</button>'+
+    '</div>';
+  document.getElementById('usr-cerrar').addEventListener('click', function(){ dlg.close(); });
+  document.getElementById('usr-nuevo-btn').addEventListener('click', function(){
+    var email = (document.getElementById('usr-nuevo-email').value||'').trim().toLowerCase();
+    var rol   = document.getElementById('usr-nuevo-rol').value;
+    if(!email || email.indexOf('@')<1){ toast('Ingresá un email válido',3000); return; }
+    db.from('usuarios').upsert({ email: email, rol: rol }, { onConflict:'email' }).then(function(res){
+      if(res.error){ toast('Error: '+res.error.message,4500); return; }
+      document.getElementById('usr-nuevo-email').value='';
+      toast('✅ Usuario agregado');
+      _cargarListaUsuarios();
+    });
+  });
+  if(!dlg.open) dlg.showModal();
+  _cargarListaUsuarios();
+}
+
+function _cargarListaUsuarios(){
+  var cont = document.getElementById('usr-lista');
+  if(!cont) return;
+  var miEmail = ((USUARIO_ACTUAL&&USUARIO_ACTUAL.email)||'').toLowerCase();
+  db.from('usuarios').select('*').order('email').then(function(res){
+    if(res.error){ cont.innerHTML='<p style="color:#dc2626;font-size:.85rem">Error: '+_escUsr(res.error.message)+'</p>'; return; }
+    var filas = (res.data||[]).slice().sort(function(a,b){
+      var pa = normalizarRol(a.rol)==='pendiente' ? 0 : 1, pb = normalizarRol(b.rol)==='pendiente' ? 0 : 1;
+      return pa-pb || String(a.email).localeCompare(String(b.email));
+    });
+    if(!filas.length){ cont.innerHTML='<p style="color:#64748b;font-size:.85rem">Todavía no hay usuarios.</p>'; return; }
+    cont.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem">'+
+      filas.map(function(u){
+        var rolN = normalizarRol(u.rol), yo = String(u.email).toLowerCase()===miEmail;
+        return '<tr data-email="'+_escUsr(u.email)+'" style="border-bottom:1px solid #f1f5f9">'+
+          '<td style="padding:.5rem .3rem"><div style="font-weight:600">'+_escUsr(u.nombre||'—')+(yo?' <span style="font-weight:400;color:#64748b">(vos)</span>':'')+'</div>'+
+            '<div style="color:#64748b;font-size:.74rem;word-break:break-all">'+_escUsr(u.email)+'</div></td>'+
+          '<td style="padding:.5rem .3rem;white-space:nowrap">'+
+            '<select class="usr-rol" '+(yo?'disabled title="No podés cambiar tu propio rol"':'')+' style="padding:.35rem;border:1px solid '+(rolN==='pendiente'?'#f59e0b':'#cbd5e1')+';border-radius:8px;font-size:.8rem">'+
+              ROLES_ASIGNABLES.map(function(r){ return '<option value="'+r+'"'+(r===rolN?' selected':'')+'>'+(ROL_LABELS[r]||r)+'</option>'; }).join('')+
+            '</select></td>'+
+          '<td style="padding:.5rem .3rem;text-align:right;white-space:nowrap">'+
+            (yo?'':'<button class="usr-guardar" style="padding:.3rem .7rem;border:none;border-radius:8px;background:#16a34a;color:#fff;font-size:.78rem;cursor:pointer">Guardar</button> '+
+                  '<button class="usr-borrar" title="Quitar acceso" style="padding:.3rem .5rem;border:1px solid #fecaca;border-radius:8px;background:#fff;color:#dc2626;font-size:.78rem;cursor:pointer">🗑️</button>')+
+          '</td></tr>';
+      }).join('')+'</table>';
+    cont.querySelectorAll('tr[data-email]').forEach(function(tr){
+      var email = tr.dataset.email;
+      var g = tr.querySelector('.usr-guardar'), b = tr.querySelector('.usr-borrar');
+      if(g) g.addEventListener('click', function(){
+        var rol = tr.querySelector('.usr-rol').value;
+        db.from('usuarios').update({ rol: rol }).eq('email', email).then(function(r2){
+          if(r2.error){ toast('Error: '+r2.error.message,4500); return; }
+          toast('✅ Rol actualizado'); prepararBotonUsuarios(); _cargarListaUsuarios();
+        });
+      });
+      if(b) b.addEventListener('click', function(){
+        if(!confirm('¿Quitar el acceso de '+email+'?')) return;
+        db.from('usuarios').delete().eq('email', email).then(function(r2){
+          if(r2.error){ toast('Error: '+r2.error.message,4500); return; }
+          toast('🗑️ Usuario eliminado'); prepararBotonUsuarios(); _cargarListaUsuarios();
+        });
+      });
+    });
+  });
 }
